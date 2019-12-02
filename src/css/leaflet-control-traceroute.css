@@ -1,0 +1,29 @@
+.leaflet-control-traceroute {
+  font-family: "Lucida Console", Monaco, monospace;
+  font-weight: bold;
+  font-size: 22px;
+  filter: saturate(0%);
+}
+
+.leaflet-control-traceroute-icon {
+  display: inline-block;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  text-align: center;
+  vertical-align: middle;
+
+  font-size: xx-large;
+  text-shadow: 4px 4px 3px grey;
+}
+
+.leaflet-control-traceroute-point:before {
+  content: "⊙";
+  /* content: "◇"; */
+  /* content: "◯"; */
+}
+
+.leaflet-control-traceroute-arrow:before {
+  content: "➤";
+  /* content: "➢"; */
+}

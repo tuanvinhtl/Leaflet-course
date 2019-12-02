@@ -1,0 +1,24 @@
+{
+  "name": "leaflet-control-traceroute",
+  "version": "1.0.0",
+  "description": "Leaflet Control to help trace a route on earth, provides distance & bearing on great circle path.",
+  "main": "src/leaflet-control-traceroute.js",
+  "style": "src/leaflet-control-traceroute.css",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "leaflet",
+    "geodesic",
+    "arc",
+    "route"
+  ],
+  "author": "elmatou",
+  "license": "MIT",
+  "peerDependencies": {
+    "leaflet": "^1.5.1"
+  },
+  "dependencies": {
+    "leaflet.geodesic": "^2.5.0"
+  }
+}
