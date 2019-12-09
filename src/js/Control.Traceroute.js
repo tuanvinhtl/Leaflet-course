@@ -1,6 +1,6 @@
 // import L from 'leaflet';
 
-import './LayerRouteGroup';
+import './LayerGroup.Route';
 import 'leaflet.geodesic';
 import '../css/trace.css';
 
@@ -131,7 +131,7 @@ L.Control.Traceroute = L.Control.extend({
   },
   new: function (e) {
     this._handlerBase(false);
-    this._currentRoute = new L.LayerRoute([], L.extend({}, this.options, { control: this }))
+    this._currentRoute = new L.LayerGroup.Route([], L.extend({}, this.options, { control: this }))
       .addTo(this._routes);
     this._map.fire('traceroute:new', this._currentRoute);
     this._handlerTrace(true);

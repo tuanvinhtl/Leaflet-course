@@ -1,11 +1,11 @@
 // Custom layer Group used to sort anykind of layers for route tracing.
 // import L from 'leaflet'
 
-import './LayerOrderedGroup';
+import './LayerGroup.Ordered';
 import './Marker.Waypoint';
 import 'leaflet.geodesic';
 
-L.LayerRoute = L.LayerGroup.extend({
+L.LayerGroup.Route = L.LayerGroup.extend({
   options: {
     trace: {},
     waypoint: {},
@@ -26,7 +26,7 @@ L.LayerRoute = L.LayerGroup.extend({
     // Create container as LayerGroup fo markers and polylines
     this.trace = new L.Geodesic([], this.options.trace).addTo(this);
     this.midpoints = new L.LayerGroup().addTo(this);
-    this.waypoints = new L.LayerOrderedGroup().addTo(this);
+    this.waypoints = new L.LayerGroup.Ordered().addTo(this);
 
     // lets proxy some methods
     this.addWaypoint = l => this.waypoints.addLayer(l);

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Leaflet Traceroute - Tracking</title>
+
+        <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/leaflet.geodesic"></script>
+
+        <link rel="stylesheet" href="src/css/leaflet-control-traceroute.css" />
+        <script src="src/js/leaflet-control-traceroute.js"></script>
+
+        <style>
+          body {padding: 0; margin: 0;}
+          html, body {height: 100%;}
+          #map {
+            height: 100%;
+          }
+        </style>
+    </head>
+    <body>
+      <div id="map"></div>
+        <script type="text/javascript">
+
+var layerOsm = new L.TileLayer ('https://{s}.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {subdomains:['server','services'], maxZoom:19, noWrap:false, attribution:'<a href="https://www.arcgis.com/">ArcGIS</a>' });
+var map = new L.Map ('map').addLayer (layerOsm).setView (new L.LatLng(48, 0), 4);
+
+
+var traceRoute = L.control.traceroute({
+  position: 'topleft',
+  track: {
+    control: {
+      toogle: ['✈', 'Suivre la position'], // ✇
+    },
+    icon: L.divIcon({ className: 'leaflet-control-route-icon', html: "<span class='leaflet-control-route-airplane'></span>", iconAnchor: [20, 18], iconSize:[40, 40]}),
+  },
+ }).addTo(map);
+
+function debugEvent(e) {
+  console.debug(e.type, e);
+}
+
+map.on('traceroute:track:update', debugEvent);
+
+
+        </script>
+    </body>
+</html>

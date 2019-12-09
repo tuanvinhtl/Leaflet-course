@@ -1,7 +1,7 @@
 // Standart LayerGroup use JS object to store layers. This is not suitable to maintain order (insertion or else) in the collection. here we use Map, and create some useful methods
 // import L from 'leaflet';
 
-L.LayerOrderedGroup = L.LayerGroup.extend({
+L.LayerGroup.Ordered = L.LayerGroup.extend({
   initialize: function (layers, options) {
     L.Util.setOptions(this, options);
 
