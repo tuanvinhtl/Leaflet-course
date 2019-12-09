@@ -1,11 +1,14 @@
 {
-  "name": "leaflet-control-traceroute",
+  "name": "leaflet-traceroute",
   "version": "1.0.0",
+  "private": true,
   "description": "Leaflet Control to help trace a route on earth, provides distance & bearing on great circle path.",
-  "main": "src/leaflet-control-traceroute.js",
-  "style": "src/leaflet-control-traceroute.css",
+  "main": "dist/leaflet-traceroute.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "webpack --watch",
+    "serve": "webpack-dev-server --hot",
+    "build": "webpack --mode=production"
   },
   "keywords": [
     "leaflet",
@@ -16,9 +19,20 @@
   "author": "elmatou",
   "license": "MIT",
   "peerDependencies": {
-    "leaflet": "^1.5.1"
+    "leaflet": "^1.6.0"
   },
   "dependencies": {
+    "leaflet": "^1.6.0",
     "leaflet.geodesic": "^2.5.0"
+  },
+  "devDependencies": {
+    "css-loader": "^3.2.1",
+    "mini-css-extract-plugin": "^0.8.0",
+    "optimize-css-assets-webpack-plugin": "^5.0.3",
+    "style-loader": "^1.0.1",
+    "terser-webpack-plugin": "^2.2.1",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.9.0"
   }
 }

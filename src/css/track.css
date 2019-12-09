@@ -1,0 +1,21 @@
+.leaflet-control-traceroute-airplane:before {
+  content: "✈";
+}
+.leaflet-control-traceroute-helicopter:before {
+  content: "✇";
+  /*content: "⊛"; */
+}
+
+@keyframes leaflet-control-traceroute-rotating {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.leaflet-control-traceroute-rotating {
+  animation-name: rotating;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+.leaflet-control-traceroute-rotating:hover{
+animation-play-state: paused;
+}

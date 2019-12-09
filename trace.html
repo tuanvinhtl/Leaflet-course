@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaflet Traceroute - Tracing a route</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+      integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+      crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+        integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+        crossorigin=""></script>
+
+    <!-- <script src="https://cdn.jsdelivr.net/npm/leaflet.geodesic"></script> -->
+    <script src="dist/leaflet-control-traceroute.js"></script>
+
+    <style>
+      body {padding: 0; margin: 0;}
+      html, body {height: 100%;}
+      #map {
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+  </body>
+  <script>
+
+  var layerOsm = new L.TileLayer ('https://{s}.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {subdomains:['server','services'], maxZoom:19, noWrap:false, attribution:'<a href="https://www.arcgis.com/">ArcGIS</a>' });
+  var map = new L.Map ('map').addLayer(layerOsm).setView (new L.LatLng(48, 0), 4);
+
+  // var layerAIP = new L.TileLayer("https://{s}.tile.maps.openaip.net/geowebcache/service/tms/1.0.0/openaip_basemap@EPSG%3A900913@png/{z}/{x}/{y}.png", {
+  //   attribution: "<a href='https://www.openaip.net' target='_blank'>openAIP</a>",
+  //   maxZoom: 14,
+  //   minZoom: 4,
+  //   tms: true,
+  //   detectRetina: true,
+  //   subdomains: '12',
+  //   format: 'image/png',
+  //   transparent: true
+  // }).addTo(map);
+
+  var traceroute = L.control.traceroute({
+    position: 'topleft',
+    trace: {
+      // color: 'green',
+    },
+    // midpoint: {
+    //   icon:null
+    // },
+    // waypoint: {
+    //   popup: "<form onchange='updateMarker(this)'><input name='stamp' type='hidden' value='{stamp}'/><input name='name' type='text' placeholder='name' value='{name}'/><br /><strong>altitude:</strong> <input name='altitude' type='number' placeholder='in feet' value='{altitude}'/><br /><strong>in :</strong> {in}<br /><strong>out :</strong> {out}<br /><strong>distance :</strong> +{distance}<br /><strong>Total distance :</strong> {totalDistance}</form>",
+    // }
+  }).addTo(map);
+  // traceroute.exportRoutes();
+  // traceroute.importRoutes();
+
+  function updateMarker(formElement) {
+    console.log(Array.from(new FormData(formElement).entries()));
+  }
+
+  function debugEvent(e) {
+    console.debug(e.type, e);
+  }
+
+  map.on('traceroute:toggle', debugEvent);
+  // map.on('traceroute:update', debugEvent);
+  map.on('traceroute:new', debugEvent);
+  map.on('traceroute:finish', debugEvent);
+  map.on('traceroute:resume', debugEvent);
+  map.on('traceroute:clear', debugEvent);
+
+  map.on('traceroute:waypoint:add', debugEvent);
+  map.on('traceroute:waypoint:move', debugEvent);
+  map.on('traceroute:waypoint:remove', debugEvent);
+
+  </script>
+</html>
