@@ -1,18 +1,10 @@
 L.Marker.Waypoint = L.Marker.extend({
   initialize: function(latlng, options) {
-
     L.Marker.prototype.initialize.call(this, latlng, L.extend({ draggable: true, autoPan: true}, options));
-
     this.route = { in: 0, out: 0, distance: 0, totalDistance:0 };
   },
   position: () => { return this._latlng },
-  // onAdd: function(map) {
-  //       .on('add remove move', e => this._mapToAdd.fire(`traceroute:waypoint:${e.type}`, e.target))
-  // },
-  // onRemove: function(map) {
-  //       .on('add remove move', e => this._mapToAdd.fire(`traceroute:waypoint:${e.type}`, e.target))
-  // },
-
+  data: {},
   // _decorate: function(prev, next) {
   //
   //   this.route.position = this._latlng

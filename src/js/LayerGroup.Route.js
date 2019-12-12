@@ -1,7 +1,7 @@
 // Custom layer Group used to sort anykind of layers for route tracing.
 // import L from 'leaflet'
 
-import './LayerGroup.Ordered';
+import './FeatureGroup.Ordered';
 import './Marker.Waypoint';
 import 'leaflet.geodesic';
 
@@ -11,7 +11,7 @@ L.LayerGroup.Route = L.LayerGroup.extend({
     waypoint: {},
     midpoint: {},
   },
-  initialize: function(layer, options) {
+  initialize: function(layer, options, context = null) {
     for (let [key, value] of Object.entries(this.options)) {
       if (options.hasOwnProperty(key)) {
         L.extend(options[key], value);
@@ -20,50 +20,67 @@ L.LayerGroup.Route = L.LayerGroup.extend({
 
     L.Util.setOptions(this, options);
 
+    this.context = context;
     this._layers = {};
     // layer.forEach(w => {this.addWaypoint(this.drawWaypoint({latlng: coords}))});
 
     // Create container as LayerGroup fo markers and polylines
-    this.trace = new L.Geodesic([], this.options.trace).addTo(this);
-    this.midpoints = new L.LayerGroup().addTo(this);
-    this.waypoints = new L.LayerGroup.Ordered().addTo(this);
+    this.trace = new L.Geodesic([], this.options.trace)
+      // .on('click', this.enable)
+      .addTo(this);
 
-    // lets proxy some methods
-    this.addWaypoint = l => this.waypoints.addLayer(l);
-    this.removeWaypoint = l => this.waypoints.removeLayer(l);
-    this.insertWaypoint = (l, after) => this.waypoints.insertLayer(l, after);
-    this.lastWaypoint = () => this.waypoints.last();
+    this.midpoints = new L.FeatureGroup()
+      .on('click', e => {
+        this.waypoints.insertLayer(
+          this.drawWaypoint(e.latlng),
+          e.layer.options.insertAfter);
+      })
+      .bindTooltip(this.options.midpoint.tooltip, { direction: 'auto' })
+      .addTo(this);
+
+    this.waypoints = new L.FeatureGroup.Ordered()
+      .bindPopup(this.options.waypoint.popup)
+    // FIXME: Tooltip Error: Unable to get source layer LatLng. with permanent: true,
+      .bindTooltip(this.options.waypoint.tooltip, { direction: 'auto' })
+      .on('click', function(e) { this._handlerClick(e) }, this.context)
+      .on('contextmenu', function(e) { this.removeLayer(e.layer) }, this.waypoints)
+
+      .on('layeradd layerremove move', this.drawTrace, this)
+      // FIXME: move or drag events are not fired on Markers and send to FeatureGroup
+      .on('layeradd', function(e) {
+        e.layer.on('move', this.drawTrace, this)
+        e.layer.on('move', function(e) { this.fire('traceroute:waypoint:move', e.layer) }, this._mapToAdd)
+      }, this)
+
+      .on('layeradd', function(e) { this.fire('traceroute:waypoint:add', e.layer) }, this._mapToAdd)
+      .on('layerremove', function(e) { this.fire('traceroute:waypoint:remove', e.layer) }, this._mapToAdd)
+      .on('move', function(e) { this.fire('traceroute:waypoint:move', e.layer) }, this._mapToAdd)
+
+      .addTo(this);
   },
   drawTrace: function(e) {
     let points = this.waypoints.getLayers();
-    try {
-      this.trace.setLatLngs(points.map(m => m.getLatLng()));
-    } catch {}  // (e if e instanceof TypeError)
+
+    this.trace.setLatLngs(points.map(m => m.getLatLng()));
     this.midpoints.clearLayers();
 
     if(points.length >= 2) {
       points.reduce((prev, current) => {
-        if (this.options.midpoint) {
-          this._drawMidpoint(prev, current).addTo(this.midpoints);
-        }
-        this._decorateWaypoint(prev, current);
-        return current
+      if (this.options.midpoint) {
+        this._drawMidpoint(prev, current).addTo(this.midpoints);
+      }
+      this._decorateWaypoint(prev, current);
+      return current
       })
     }
     this._mapToAdd.fire('traceroute:update', this);
   },
-  drawWaypoint: function(e) {
+  drawWaypoint: function(latlng) {
     // TODO: stop dragging when tracing is inactive
-    return new L.Marker.Waypoint(e.latlng, L.extend({ routeId: L.Util.stamp(this) }, this.options.waypoint))
-    .on('contextmenu', e => {
-      if (!this.options.control.active) { return }
-      this.removeWaypoint(e.target)
-    }, this)
-    .on('add remove move', this.drawTrace, this)
-    .on('add remove move', e => this._mapToAdd.fire(`traceroute:waypoint:${e.type}`, e.target))
-
+    return new L.Marker.Waypoint(latlng, L.extend({ routeId: L.Util.stamp(this) }, this.options.waypoint))
   },
   _drawMidpoint: function(start, end) {
+    // TODO: orientation should be set in midpoint icon options
     let brg = this.trace.geom.geodesic.inverse(start.getLatLng(), end.getLatLng());
     this.options.midpoint.icon.options.html = this.options.midpoint.icon.options.html.cloneNode();
     this.options.midpoint.icon.options.html.style.transform = `rotate(${Math.round(-90 + (brg.initialBearing + brg.finalBearing) / 2) % 360}deg)`;
@@ -71,7 +88,6 @@ L.LayerGroup.Route = L.LayerGroup.extend({
     return new L.Marker(
       this.trace.geom.geodesic.midpoint(start.getLatLng(), end.getLatLng()),
       L.extend({ routeId: L.Util.stamp(this), insertAfter : L.Util.stamp(start) }, this.options.midpoint))
-       .on('click', this.options.control._createWaypoint, this.options.control);
   },
   _decorateWaypoint: function(prev, next) {
     let params = this.trace.geom.geodesic.inverse(prev.getLatLng(), next.getLatLng());

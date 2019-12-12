@@ -26,23 +26,6 @@ L.LayerGroup.Ordered = L.LayerGroup.extend({
 
     return this;
   },
-  removeLayer: function (layer) {
-    var id = this._layers.has(layer) ? layer : this.getLayerId(layer);
-
-    if (this._map && this._layers.delete(id)) {
-      this._map.removeLayer(layer);
-    }
-
-    return this;
-  },
-  // // @method hasLayer(layer: Layer): Boolean
-  // // Returns `true` if the given layer is currently added to the group.
-  // // @alternative
-  // // @method hasLayer(id: Number): Boolean
-  // // Returns `true` if the given internal ID is currently added to the group.
-  // hasLayer: function (layer) {
-  //   return !!layer && (this._layers.has(layer) ||  this._layers.has(this.getLayerId(layer)));
-  // },
   // @method insertLayer(layer: Layer, after: Number): this
   // Inserts the given layer to the group after the layer with the given internal ID.
   insertLayer: function(new_layer, after) {
@@ -60,8 +43,17 @@ L.LayerGroup.Ordered = L.LayerGroup.extend({
     }
     return this;
   },
-  last: function() {
-    return Array.from(this._layers.values()).pop();
+  removeLayer: function (layer) {
+    var id = this._layers.has(layer) ? layer : this.getLayerId(layer);
+
+    if (this._map && this._layers.delete(id)) {
+      this._map.removeLayer(layer);
+    }
+
+    return this;
+  },
+  hasLayer: function (layer) {
+    return !!layer && (this._layers.has(layer) || this._layers.has(this.getLayerId(layer)));
   },
   invoke: function (methodName) {
     for (layer of this._layers.values()) {
@@ -83,5 +75,12 @@ L.LayerGroup.Ordered = L.LayerGroup.extend({
   },
   getLayers: function () {
     return Array.from(this._layers.values());
+  },
+  last: function() {
+    return this.getLayers().pop();
   }
 });
+
+// L.layergroup.ordered= function(opts) {
+//   return new L.LayerGroup.Ordered(opts);
+// };

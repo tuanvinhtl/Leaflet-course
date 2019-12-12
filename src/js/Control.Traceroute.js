@@ -22,6 +22,7 @@ L.Control.Traceroute = L.Control.extend({
     },
     midpoint: {
       icon: L.divIcon({ className: 'leaflet-control-traceroute-icon', html: L.DomUtil.create('div', 'leaflet-control-traceroute-arrow'), iconAnchor: [20, 18], iconSize:[40, 40]}),
+      tooltip: 'Click to insert a waypoints here',
     },
     pointerTrace: {dashArray: '8'},
     trace: {
@@ -101,7 +102,7 @@ L.Control.Traceroute = L.Control.extend({
   },
   _drawPointerTrace: function(e) {
     if(this._currentRoute.waypoints.getLayers().length > 0) {
-      this._pointerTrace.setLatLngs([this._currentRoute.lastWaypoint().getLatLng(), e.latlng]);
+      this._pointerTrace.setLatLngs([this._currentRoute.waypoints.last().getLatLng(), e.latlng]);
     }
   },
   active: false,
@@ -131,7 +132,7 @@ L.Control.Traceroute = L.Control.extend({
   },
   new: function (e) {
     this._handlerBase(false);
-    this._currentRoute = new L.LayerGroup.Route([], L.extend({}, this.options, { control: this }))
+    this._currentRoute = new L.LayerGroup.Route([], this.options, this)
       .addTo(this._routes);
     this._map.fire('traceroute:new', this._currentRoute);
     this._handlerTrace(true);
@@ -172,24 +173,10 @@ L.Control.Traceroute = L.Control.extend({
     if(!this._currentRoute && e.target.options.routeId) { // if no route is active but the marker got a route reference, active the route.
       this._currentRoute = this._routes.getLayer(e.target.options.routeId);
     }
-    let newMarker = this._currentRoute.drawWaypoint(e)
-      .on('click', e => {
-        if (!this.active) { return }
-        if (this._currentRoute) { // if we are tracing a route, stop it
-          this.finish();
-        } else if (this._routes.getLayer(e.target.options.routeId).lastWaypoint() === e.target) { // if we are not tracing a route and this is the last point af the route, resume the tracing
-          this.resume(this._routes.getLayer(e.target.options.routeId))
-        }
-      }, this)
-      .bindPopup(this.options.waypoint.popup, {})
-      .bindTooltip(this.options.waypoint.tooltip, { permanent: true, direction: 'auto' });
-
-    if (e.target.options.insertAfter) { // insert the new point in route or at it at the end
-      this._currentRoute.insertWaypoint(newMarker, e.target.options.insertAfter);
-    } else {
-      this._currentRoute.addWaypoint(newMarker);
-      this._drawPointerTrace(e);
-    }
+    this._currentRoute.waypoints.addLayer(
+      this._currentRoute.drawWaypoint(e.latlng)
+    );
+    this._drawPointerTrace(e);
   },
   _handlerBase: function(active) {
     if (active) {
@@ -212,6 +199,19 @@ L.Control.Traceroute = L.Control.extend({
       this._map.off('mousemove', this._drawPointerTrace, this);
       this._map.off('click', this._createWaypoint, this);
       this._map.off('dblclick', this.finish, this);
+    }
+  },
+  _handlerClick: function(e) {
+    if (!this.active) {
+      return
+    } else if (this._currentRoute) { // if we are tracing a route, stop it
+      this.finish();
+    } else if (this._routes.getLayer(e.target.options.routeId).waypoints.last() === e.target) { // if we are not tracing a route and this is the last point af the route, resume the tracing
+      this.resume(this._routes.getLayer(e.target.options.routeId));
+    } else { // start the bearing tracing
+      // this._routes.getLayer(e.target.options.routeId)
+      // this.newBearing(e);
+      console.trace(e);
     }
   },
   statics: {

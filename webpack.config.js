@@ -35,7 +35,9 @@ module.exports = {
     ]
   },
   devServer: {
+    contentBase: './',
+    index: 'trace.html',
     https: true,
-    bonjour: true
+    // bonjour: true
   }
 };
