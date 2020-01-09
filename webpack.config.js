@@ -35,9 +35,12 @@ module.exports = {
     ]
   },
   devServer: {
+    contentBase: [__dirname, path.join(__dirname, 'dist')],
     contentBase: './',
-    index: 'trace.html',
+    watchContentBase: true,
     https: true,
+    open: true,
+    openPage: ['trace.html']
     // bonjour: true
   }
 };

@@ -1,6 +1,10 @@
 // import L from 'leaflet';
 
 import './LayerGroup.Route';
+import './Handler.Traceroute';
+import './Handler.Start';
+import './Handler.Trace';
+import './Handler.Bearing';
 import 'leaflet.geodesic';
 import '../css/trace.css';
 
@@ -40,9 +44,9 @@ L.Control.Traceroute = L.Control.extend({
     }
     L.Util.setOptions(this, options);
 
-    this._oldSettings = {};
-    this._pointerTrace = null;
-    this._currentRoute = null;
+    this.controlHandler = new L.Handler.Traceroute(this);
+    this.startRouteHandler = new L.Handler.Start(this);
+    this.traceRouteHandler = new L.Handler.Trace(this);
   },
   onAdd: function(map) {
     this._map = map;
@@ -54,7 +58,7 @@ L.Control.Traceroute = L.Control.extend({
 
     if(this.options.control.toggle) {
       linksContainer.appendChild(
-        this._createControl(this.options.control.toggle[0], this.options.control.toggle[1], this.toggle)
+        this._createControl(this.options.control.toggle[0], this.options.control.toggle[1], this.traceMode)
       );
     }
     if(this.options.control.compass) {
@@ -68,14 +72,13 @@ L.Control.Traceroute = L.Control.extend({
       );
     }
 
-    return linksContainer
+    return linksContainer;
   },
   onRemove: function(map) {
-    this._routes.addTo(this._map);
-    this._pointerTrace.addTo(this._map);
-    this._handlerBase(false);
-    this._handlerTrace(false);
-    this.toogle(false);
+    this._routes.removeTo(this._map);
+    this.controlHandler.disable();
+    this.traceRouteHandler.disable();
+    this.startRouteHandler.disable();
   },
   _createControl: function(label, title, fn) {
     let control = document.createElement('a');
@@ -84,136 +87,35 @@ L.Control.Traceroute = L.Control.extend({
     control.setAttribute('title', title);
     control.setAttribute('href', '#');
     control.setAttribute('role', 'button');
+    L.DomEvent.on(control, 'click', fn, this);
 
-    L.DomEvent.on(control, 'click', e => {
-      e.target.style.filter = `invert(${fn.apply(this, e) ? 1 : 0})`
-    }, this);
-    // TODO: invert icon if toogled from code
     return control;
   },
-  _onKeyDown: function(e) {
-    if (e.keyCode === 27) {
-      if (this._currentRoute) {
-        this.finish();
-      } else {
-        this.toggle(false);
-      }
-    }
-  },
-  _drawPointerTrace: function(e) {
-    if(this._currentRoute.waypoints.getLayers().length > 0) {
-      this._pointerTrace.setLatLngs([this._currentRoute.waypoints.last().getLatLng(), e.latlng]);
-    }
-  },
-  active: false,
   _routes: L.layerGroup(),
-  toggle: function (force) {
-    this.active = (force === undefined) ? !this.active : force;
-    if(this.active) {
-      this._oldSettings.cursor = this._map._container.style.cursor;
-      this._map._container.style.cursor = 'crosshair';
-      this._oldSettings.doubleClickZoom = this._map.doubleClickZoom.enabled();
-      this._map.doubleClickZoom.disable();
+  traceMode: function(e) {
+    var target = e.target;
+    this.traceMode = function() { // the Closure Horror Picture Show !!
+      if(!this.startRouteHandler.enabled()) {
+        this.startRouteHandler.enable();
+        target.style.filter = 'invert(1)';
+      } else {
+        this.startRouteHandler.disable();
+        target.style.filter = 'invert(0)';
+      }
+      return this.startRouteHandler.enabled();
+    } // end
 
-      L.DomEvent.on(document, 'keydown', this._onKeyDown, this);
-      this._handlerBase(true);
-    } else {
-      this._map._container.style.cursor = this._oldSettings.cursor;
-      if(this._oldSettings.doubleClickZoom) { this._map.doubleClickZoom.enable() }
-      this._pointerTrace.removeFrom(this._map);
-      L.DomEvent.off(document, 'keydown', this._onKeyDown, this);
-
-      this._handlerBase(false);
-      if (this._activeRoute) {this.finish();}
-    }
-    this._map.fire('traceroute:toggle', this);
-    // this._map.fire('traceroute:toggle', {active: this.active});
-    return this.active;
+    return this.traceMode(e);
   },
-  new: function (e) {
-    this._handlerBase(false);
-    this._currentRoute = new L.LayerGroup.Route([], this.options, this)
-      .addTo(this._routes);
-    this._map.fire('traceroute:new', this._currentRoute);
-    this._handlerTrace(true);
-    this._createWaypoint(e);
   },
-  finish: function() {
-    this._handlerTrace(false);
-    if (this._currentRoute.waypoints.getLayers().length > 1) {
-      this._map.fire('traceroute:finish', this._currentRoute);
-    } else {
-      this._routes.removeLayer(this._currentRoute);
-    }
-    this._currentRoute = null;
-    this._handlerBase(true);
-  },
-  resume: function(route) {
-    this._handlerBase(false);
-    this._currentRoute = route;
-    this._handlerTrace(true);
-    this._map.fire('traceroute:resume', this._currentRoute);
-  },
-  clear: function(route) {
-    if (route) {
-      route.clearLayers();
-    } else {
-      this._routes.clearLayers();
-    }
-    this._pointerTrace.setLatLngs([]);
+  clear: function() {
+    this.traceRouteHandler.disable();
+    this._routes.clearLayers();
     this._map.fire('traceroute:clear');
     return false;
   },
   // import: (waypoints) => {},
-  export: (route) => {
-    return L.Control.Traceroute.export(route ? route : this._currentRoute);
-  },
-  _createWaypoint: function(e) {
-    if (!this.active) { return }
-    if(!this._currentRoute && e.target.options.routeId) { // if no route is active but the marker got a route reference, active the route.
-      this._currentRoute = this._routes.getLayer(e.target.options.routeId);
-    }
-    this._currentRoute.waypoints.addLayer(
-      this._currentRoute.drawWaypoint(e.latlng)
-    );
-    this._drawPointerTrace(e);
-  },
-  _handlerBase: function(active) {
-    if (active) {
-      this._map.on('click', this.new, this);
-    } else {
-      this._map.off('click', this.new, this);
-    }
-  },
-  _handlerTrace: function(active) {
-    if (active) {
-      this._pointerTrace = new L.Geodesic([], this.options.pointerTrace);
-      this._pointerTrace.addTo(this._map);
-
-      this._map.on('mousemove', this._drawPointerTrace, this);
-      this._map.on('click', this._createWaypoint, this);
-      this._map.on('dblclick', this.finish, this);
-    } else {
-      this._pointerTrace.setLatLngs([]);
-      this._pointerTrace.removeFrom(this._map);
-      this._map.off('mousemove', this._drawPointerTrace, this);
-      this._map.off('click', this._createWaypoint, this);
-      this._map.off('dblclick', this.finish, this);
-    }
-  },
-  _handlerClick: function(e) {
-    if (!this.active) {
-      return
-    } else if (this._currentRoute) { // if we are tracing a route, stop it
-      this.finish();
-    } else if (this._routes.getLayer(e.target.options.routeId).waypoints.last() === e.target) { // if we are not tracing a route and this is the last point af the route, resume the tracing
-      this.resume(this._routes.getLayer(e.target.options.routeId));
-    } else { // start the bearing tracing
-      // this._routes.getLayer(e.target.options.routeId)
-      // this.newBearing(e);
-      console.trace(e);
-    }
-  },
+  // export: (route) => {},
   statics: {
     format(number, unit) {
       const one_NM = 1852;
@@ -260,15 +162,14 @@ L.Control.Traceroute = L.Control.extend({
         longitude: this.format(waypoint.position.longitude, '°'),
       }
     },
-    export(route) {
-      route.waypoints.getLayers().forEach(m => {
-        console.debug(m.toGeoJSON());
-      });
-    },
+    // export(route) {
+    //   route.waypoints.getLayers().forEach(m => {
+    //     console.debug(m.toGeoJSON());
+    //   });
+    // },
   }
 })
 
 L.control.traceroute = function(opts) {
   return new L.Control.Traceroute(opts);
 };
-// L.control.traceroute = opts => new L.Control.Traceroute(opts);

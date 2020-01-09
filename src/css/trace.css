@@ -19,10 +19,8 @@
 
 .leaflet-control-traceroute-point:before {
   content: "⊙";
-  /* content: "◇"; */
   /* content: "◯"; */
 }
-
 .leaflet-control-traceroute-arrow:before {
   content: "➤";
   /* content: "➢"; */

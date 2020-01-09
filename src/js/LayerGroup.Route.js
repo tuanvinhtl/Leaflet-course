@@ -3,60 +3,89 @@
 
 import './FeatureGroup.Ordered';
 import './Marker.Waypoint';
+import './Handler.Edit';
 import 'leaflet.geodesic';
 
 L.LayerGroup.Route = L.LayerGroup.extend({
   options: {
-    trace: {},
-    waypoint: {},
-    midpoint: {},
+    bubblingMouseEvents: false,
+    trace: {bubblingMouseEvents: false},
+    waypoint: {bubblingMouseEvents: false},
+    midpoint: {bubblingMouseEvents: false},
   },
-  initialize: function(layer, options, context = null) {
+  initialize: function(layer, options) {
     for (let [key, value] of Object.entries(this.options)) {
       if (options.hasOwnProperty(key)) {
         L.extend(options[key], value);
       }
     }
-
     L.Util.setOptions(this, options);
 
-    this.context = context;
     this._layers = {};
-    // layer.forEach(w => {this.addWaypoint(this.drawWaypoint({latlng: coords}))});
+    this.edit = new L.Handler.Edit(this);
+    // TODO: Allow importing data to create a route
+    // layer.forEach(w => {this.waypoints.addLayer(this.drawWaypoint({latlng: coords}))});
 
     // Create container as LayerGroup fo markers and polylines
     this.trace = new L.Geodesic([], this.options.trace)
-      // .on('click', this.enable)
       .addTo(this);
 
     this.midpoints = new L.FeatureGroup()
-      .on('click', e => {
-        this.waypoints.insertLayer(
-          this.drawWaypoint(e.latlng),
-          e.layer.options.insertAfter);
-      })
       .bindTooltip(this.options.midpoint.tooltip, { direction: 'auto' })
+      .addTo(this);
+
+    this.bearingpoints = new L.FeatureGroup()
+      .on('layeradd layerremove move', this.drawBearing, this)
+      .bindTooltip(this.options.targetpoint.tooltip, { direction: 'auto' })
       .addTo(this);
 
     this.waypoints = new L.FeatureGroup.Ordered()
       .bindPopup(this.options.waypoint.popup)
-    // FIXME: Tooltip Error: Unable to get source layer LatLng. with permanent: true,
+    // FIXME: Tooltip Error: Unable to get source layer LatLng. with permanent: true, : https://github.com/Leaflet/Leaflet/issues/6938
       .bindTooltip(this.options.waypoint.tooltip, { direction: 'auto' })
-      .on('click', function(e) { this._handlerClick(e) }, this.context)
-      .on('contextmenu', function(e) { this.removeLayer(e.layer) }, this.waypoints)
-
+      .on('layerremove', this.clean, this)
       .on('layeradd layerremove move', this.drawTrace, this)
-      // FIXME: move or drag events are not fired on Markers and send to FeatureGroup
+      // FIXME: context is not set to _mapToAdd
+      .on('layeradd layerremove move', this._fireWithLayer, this._mapToAdd)
       .on('layeradd', function(e) {
-        e.layer.on('move', this.drawTrace, this)
-        e.layer.on('move', function(e) { this.fire('traceroute:waypoint:move', e.layer) }, this._mapToAdd)
+        // FIXME: 'move' event is not propagated to FeatureGroup : https://github.com/Leaflet/Leaflet/issues/6937
+        e.layer
+          .on('move', this.drawTrace, this)
+          .on('move', this._fireWithLayer, this._mapToAdd)
       }, this)
-
-      .on('layeradd', function(e) { this.fire('traceroute:waypoint:add', e.layer) }, this._mapToAdd)
-      .on('layerremove', function(e) { this.fire('traceroute:waypoint:remove', e.layer) }, this._mapToAdd)
-      .on('move', function(e) { this.fire('traceroute:waypoint:move', e.layer) }, this._mapToAdd)
-
       .addTo(this);
+  },
+  clean: function() {
+    if (this.waypoints.getLayers().length < 2) {
+      this.waypoints.clearLayers();
+      return false;
+    } else {
+      return true;
+    }
+  },
+  createWaypoint: function(e) {
+    let wp = new L.Marker.Waypoint(e.latlng,
+      L.extend({ routeId: L.Util.stamp(this) }, this.options.waypoint)
+    );
+    if (e.layer && e.layer.options.insertAfter) {
+      this.waypoints.insertLayer(wp, e.layer.options.insertAfter);
+    } else {
+      this.waypoints.addLayer(wp);
+    }
+  },
+  createBearing: function(latlng, options) {
+    this.bearingpoints.addLayer(
+      new L.Marker.Targetpoint(latlng,
+        L.extend(options, this.options.targetpoint)
+      )
+    );
+  },
+  drawBearing: function() {
+    this.bearingpoints.eachLayer(function(target) {
+      console.log(target.options);
+      target._decorate();
+    });
+
   },
   drawTrace: function(e) {
     let points = this.waypoints.getLayers();
@@ -74,10 +103,6 @@ L.LayerGroup.Route = L.LayerGroup.extend({
       })
     }
     this._mapToAdd.fire('traceroute:update', this);
-  },
-  drawWaypoint: function(latlng) {
-    // TODO: stop dragging when tracing is inactive
-    return new L.Marker.Waypoint(latlng, L.extend({ routeId: L.Util.stamp(this) }, this.options.waypoint))
   },
   _drawMidpoint: function(start, end) {
     // TODO: orientation should be set in midpoint icon options
@@ -99,6 +124,11 @@ L.LayerGroup.Route = L.LayerGroup.extend({
     prev.togglePopup().togglePopup().toggleTooltip().toggleTooltip();
     next.togglePopup().togglePopup().toggleTooltip().toggleTooltip();
     return [prev, next];
+  },
+  _fireWithLayer: function(e) {
+    // console.log(this, e.layer);
+    // FIXME: fire add and remove event
+    this.fire(`traceroute:waypoint:${e.type.replace('layer','')}`, e.layer || e.target)
   },
   import: () => {},
   export: function() {

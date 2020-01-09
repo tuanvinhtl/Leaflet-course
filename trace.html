@@ -61,11 +61,13 @@
     console.debug(e.type, e);
   }
 
-  map.on('traceroute:toggle', debugEvent);
+  map.on('traceroute:trace:start', debugEvent);
+  map.on('traceroute:trace:stop', debugEvent);
   // map.on('traceroute:update', debugEvent);
-  map.on('traceroute:new', debugEvent);
-  map.on('traceroute:finish', debugEvent);
-  map.on('traceroute:resume', debugEvent);
+  map.on('traceroute:route:new', debugEvent);
+  map.on('traceroute:route:finish', debugEvent);
+  map.on('traceroute:route:abort', debugEvent);
+  map.on('traceroute:route:resume', debugEvent);
   map.on('traceroute:clear', debugEvent);
 
   map.on('traceroute:waypoint:add', debugEvent);

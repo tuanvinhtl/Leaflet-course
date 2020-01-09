@@ -56,18 +56,21 @@ L.LayerGroup.Ordered = L.LayerGroup.extend({
     return !!layer && (this._layers.has(layer) || this._layers.has(this.getLayerId(layer)));
   },
   invoke: function (methodName) {
-    for (layer of this._layers.values()) {
+    var args = Array.prototype.slice.call(arguments, 1)
+
+    this._layers.forEach(layer => {
       if (layer[methodName]) {
         layer[methodName].apply(layer, args);
       }
-    }
+    })
 
     return this;
   },
   eachLayer: function (method, context) {
-    for (var layer of this._layers.values()) {
+    this._layers.forEach(layer => {
       method.call(context, layer);
-    }
+    })
+    
     return this;
   },
   getLayer: function (id) {
