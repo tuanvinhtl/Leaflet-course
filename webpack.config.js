@@ -40,7 +40,7 @@ module.exports = {
     watchContentBase: true,
     https: true,
     open: true,
-    openPage: ['trace.html']
+    openPage: ['demo.html']
     // bonjour: true
   }
 };
