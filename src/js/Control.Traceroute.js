@@ -2,19 +2,19 @@
 
 import './LayerGroup.Route';
 import './Handler.Traceroute';
-import './Handler.Start';
-import './Handler.Trace';
-import './Handler.Bearing';
+import './Handler.RouteBase';
+import './Handler.BearingBase';
 import 'leaflet.geodesic';
 import '../css/trace.css';
 
 L.Control.Traceroute = L.Control.extend({
   options: {
     control: {
-      toggle: ['☡', 'Start a route'], // ⥉
+      trace: ['☡', 'Start a route'], // ⥉
       clear: ['✗', 'Clear routes'], // ⥇
-      compass: ['∡', 'Radio Navigation'], // 🧭∢∠
+      bearing: ['∡', 'Radio Navigation'], // 🧭∢∠
     },
+    pointerTrace: {dashArray: '8'},
     waypoint: {
       icon: L.divIcon({ className: 'leaflet-control-traceroute-icon', html: "<span class='leaflet-control-traceroute-point'></span>", iconAnchor: [20, 18], iconSize:[40, 40]}),
       popup: p => {
@@ -28,11 +28,21 @@ L.Control.Traceroute = L.Control.extend({
       icon: L.divIcon({ className: 'leaflet-control-traceroute-icon', html: L.DomUtil.create('div', 'leaflet-control-traceroute-arrow'), iconAnchor: [20, 18], iconSize:[40, 40]}),
       tooltip: 'Click to insert a waypoints here',
     },
-    pointerTrace: {dashArray: '8'},
     trace: {
       weight: 5,
       opacity: 0.5,
       color: 'black',
+    },
+    bearingpoint: {
+      icon: L.divIcon({ className: 'leaflet-control-traceroute-icon', html: "<span class='leaflet-control-traceroute-losange'></span>", iconAnchor: [20, 18], iconSize:[40, 40]}),
+      tooltip: p => {
+        return L.Util.template("<strong>QDR :</strong> {qdr}<br /><strong>QDM :</strong> {qdm}<br /><strong>distance :</strong> +{distance}", L.Control.Traceroute.extractData(p))
+      },
+    },
+    bearings: {
+      dashArray: '5,5,1,5',
+      opacity: 0.3,
+      color: 'grey',
     },
   },
   initialize: function (options) {
@@ -44,9 +54,11 @@ L.Control.Traceroute = L.Control.extend({
     }
     L.Util.setOptions(this, options);
 
-    this.controlHandler = new L.Handler.Traceroute(this);
-    this.startRouteHandler = new L.Handler.Start(this);
-    this.traceRouteHandler = new L.Handler.Trace(this);
+    this.handlers = {
+      base: new L.Handler.Traceroute(this),
+      route: new L.Handler.RouteBase(this),
+      bearing:new L.Handler.BearingStart(this)
+    };
   },
   onAdd: function(map) {
     this._map = map;
@@ -56,19 +68,19 @@ L.Control.Traceroute = L.Control.extend({
     linksContainer.classList.add('leaflet-bar');
     L.DomEvent.disableClickPropagation(linksContainer);
 
-    if(this.options.control.toggle) {
+    if(this.options.control.trace) {
       linksContainer.appendChild(
-        this._createControl(this.options.control.toggle[0], this.options.control.toggle[1], this.traceMode)
+        this._createControl(...this.options.control.trace, this._toggleMode(this.handlers.route))
       );
     }
-    if(this.options.control.compass) {
+    if(this.options.control.bearing) {
       linksContainer.appendChild(
-        this._createControl(this.options.control.compass[0], this.options.control.compass[1], this.toggle)
+        this._createControl(...this.options.control.bearing, this._toggleMode(this.handlers.bearing))
       );
     }
     if(this.options.control.clear) {
       linksContainer.appendChild(
-        this._createControl(this.options.control.clear[0], this.options.control.clear[1], this.clear)
+        this._createControl(...this.options.control.clear, this.clear)
       );
     }
 
@@ -76,9 +88,8 @@ L.Control.Traceroute = L.Control.extend({
   },
   onRemove: function(map) {
     this._routes.removeTo(this._map);
-    this.controlHandler.disable();
-    this.traceRouteHandler.disable();
-    this.startRouteHandler.disable();
+    this.handlers.routeBase.disable();
+    this.handlers.bearingStart.disable();
   },
   _createControl: function(label, title, fn) {
     let control = document.createElement('a');
@@ -92,27 +103,25 @@ L.Control.Traceroute = L.Control.extend({
     return control;
   },
   _routes: L.layerGroup(),
-  traceMode: function(e) {
-    var target = e.target;
-    this.traceMode = function() { // the Closure Horror Picture Show !!
-      if(!this.startRouteHandler.enabled()) {
-        this.startRouteHandler.enable();
-        target.style.filter = 'invert(1)';
-      } else {
-        this.startRouteHandler.disable();
-        target.style.filter = 'invert(0)';
-      }
-      return this.startRouteHandler.enabled();
-    } // end
-
-    return this.traceMode(e);
-  },
-  },
   clear: function() {
-    this.traceRouteHandler.disable();
+    this.handlers.route.disable();
+    this.handlers.bearing.disable();
     this._routes.clearLayers();
     this._map.fire('traceroute:clear');
     return false;
+  },
+  _toggleMode: function(handler) {
+    return function (e) {
+      if (e && e.target) {
+        handler.target = e.target;
+      }
+      if(!handler.enabled()) {
+        handler.enable();
+      } else {
+        handler.disable();
+      }
+      return handler.enabled();
+    }
   },
   // import: (waypoints) => {},
   // export: (route) => {},
@@ -160,6 +169,8 @@ L.Control.Traceroute = L.Control.extend({
         altitude: this.format(waypoint.position.altitude, 'ft'),
         latitude: this.format(waypoint.position.latitude, '°'),
         longitude: this.format(waypoint.position.longitude, '°'),
+        qdr: this.format(waypoint.route.qdr, '°'),
+        qdm: this.format(waypoint.route.qdm, '°'),
       }
     },
     // export(route) {

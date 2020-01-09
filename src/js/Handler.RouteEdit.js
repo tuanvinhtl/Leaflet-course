@@ -1,5 +1,5 @@
-// handle interactions a route route, even after it as been traced.
-L.Handler.Edit = L.Handler.extend({
+// handle interactions route, even after it as been traced.
+L.Handler.RouteEdit = L.Handler.extend({
   initialize: function (route) {
     this._route = route;
   },
@@ -10,6 +10,7 @@ L.Handler.Edit = L.Handler.extend({
     this._route.waypoints
       .on('contextmenu', this._removeLayer, this._route.waypoints)
       .eachLayer(layer => layer.dragging.enable());
+  // TODO: midpoints popup & tooltip presence should be here
   },
 
   removeHooks: function() {
@@ -20,13 +21,13 @@ L.Handler.Edit = L.Handler.extend({
       .off('contextmenu', this._removeLayer, this._route.waypoints)
       .eachLayer(layer => layer.dragging.disable());
   },
-  _resumeRouteIfLast: function(e) {
-    if (e.layer === this._route.waypoints.last()) {
-      this.disable();
-      controle.traceRouteHandler.enable()
-      this._resumeRoute()
-    }
-  },
+  // _resumeRouteIfLast: function(e) {
+  //   if (e.layer === this._route.waypoints.last()) {
+  //     this.disable();
+  //     controle.traceRouteHandler.enable()
+  //     this._resumeRoute()
+  //   }
+  // },
   _removeLayer: function(e) {
     this.removeLayer(e.layer)
   },

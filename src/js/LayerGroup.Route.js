@@ -3,7 +3,7 @@
 
 import './FeatureGroup.Ordered';
 import './Marker.Waypoint';
-import './Handler.Edit';
+import './Handler.RouteEdit';
 import 'leaflet.geodesic';
 
 L.LayerGroup.Route = L.LayerGroup.extend({
@@ -22,7 +22,7 @@ L.LayerGroup.Route = L.LayerGroup.extend({
     L.Util.setOptions(this, options);
 
     this._layers = {};
-    this.edit = new L.Handler.Edit(this);
+    this.editHandler = new L.Handler.RouteEdit(this);
     // TODO: Allow importing data to create a route
     // layer.forEach(w => {this.waypoints.addLayer(this.drawWaypoint({latlng: coords}))});
 
@@ -34,26 +34,37 @@ L.LayerGroup.Route = L.LayerGroup.extend({
       .bindTooltip(this.options.midpoint.tooltip, { direction: 'auto' })
       .addTo(this);
 
-    this.bearingpoints = new L.FeatureGroup()
-      .on('layeradd layerremove move', this.drawBearing, this)
-      .bindTooltip(this.options.targetpoint.tooltip, { direction: 'auto' })
-      .addTo(this);
-
     this.waypoints = new L.FeatureGroup.Ordered()
       .bindPopup(this.options.waypoint.popup)
     // FIXME: Tooltip Error: Unable to get source layer LatLng. with permanent: true, : https://github.com/Leaflet/Leaflet/issues/6938
       .bindTooltip(this.options.waypoint.tooltip, { direction: 'auto' })
       .on('layerremove', this.clean, this)
       .on('layeradd layerremove move', this.drawTrace, this)
+      .on('layeradd layerremove move', this.drawBearings, this)
       // FIXME: context is not set to _mapToAdd
       .on('layeradd layerremove move', this._fireWithLayer, this._mapToAdd)
       .on('layeradd', function(e) {
         // FIXME: 'move' event is not propagated to FeatureGroup : https://github.com/Leaflet/Leaflet/issues/6937
         e.layer
           .on('move', this.drawTrace, this)
+          .on('move', this.drawBearings, this)
           .on('move', this._fireWithLayer, this._mapToAdd)
       }, this)
       .addTo(this);
+
+    this.bearingpoints = new L.FeatureGroup()
+      .on('layeradd layerremove move', this.drawBearings, this)
+      .on('layeradd', function(e) {
+        // FIXME: 'move' event is not propagated to FeatureGroup : https://github.com/Leaflet/Leaflet/issues/6937
+        e.layer
+          .on('move', this.drawBearings, this)
+      }, this)
+      .bindTooltip(this.options.bearingpoint.tooltip, { direction: 'auto' })
+      .addTo(this);
+
+    this.bearings = new L.Polyline([], this.options.bearings)
+      .addTo(this);
+
   },
   clean: function() {
     if (this.waypoints.getLayers().length < 2) {
@@ -72,20 +83,23 @@ L.LayerGroup.Route = L.LayerGroup.extend({
     } else {
       this.waypoints.addLayer(wp);
     }
+    return wp;
   },
-  createBearing: function(latlng, options) {
-    this.bearingpoints.addLayer(
-      new L.Marker.Targetpoint(latlng,
-        L.extend(options, this.options.targetpoint)
-      )
-    );
+  createBearing: function(latlng, origin) {
+    let bp = new L.Marker.Bearingpoint(latlng,
+      L.extend({ origin: origin }, this.options.bearingpoint)
+    )
+    this.bearingpoints.addLayer(bp);
+    return bp;
   },
-  drawBearing: function() {
-    this.bearingpoints.eachLayer(function(target) {
-      console.log(target.options);
-      target._decorate();
+  drawBearings: function() {
+    let traces = [];
+    this.bearingpoints.eachLayer(function(bp) {
+      traces.push([bp.getLatLng(), bp.options.origin.getLatLng()]);
+      bp._decorate();
     });
 
+    this.bearings.setLatLngs(traces);
   },
   drawTrace: function(e) {
     let points = this.waypoints.getLayers();

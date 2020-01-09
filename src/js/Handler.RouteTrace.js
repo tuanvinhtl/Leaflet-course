@@ -1,11 +1,11 @@
-// Handle interaction while adding Waypoints one after another.
-L.Handler.Trace = L.Handler.extend({
+// Handle interactions while adding Waypoints one after another.
+L.Handler.RouteTrace = L.Handler.extend({
   initialize: function (control) {
     this._control = control;
     this._pointerTrace = new L.Geodesic([], this._control.options.pointerTrace);
   },
   addHooks: function() {
-    this._control.startRouteHandler.disable();
+    this._control.handlers.route.startHandler.disable();
     this._clearPointerTrace();
     this._pointerTrace.addTo(this._control._map);
     this._control._map
@@ -36,11 +36,7 @@ L.Handler.Trace = L.Handler.extend({
       .off('click', this._finishRouteIfLast, this);
 
     this._route = null;
-    this._control.startRouteHandler.enable();
-  },
-  setRoute: function(route) {
-    route.edit.disable();
-    return this._route = route;
+    this._control.handlers.route.startHandler.enable();
   },
   _createRoute: function() {
     this._control._map.fire('traceroute:route:new', this._route);
@@ -61,7 +57,7 @@ L.Handler.Trace = L.Handler.extend({
   _finishRoute: function() {
     if (this._route.clean()) {
       this._control._map.fire('traceroute:route:finish', this._route);
-      this._route.edit.enable();
+      this._route.editHandler.enable();
     } else {
       this._control._map.fire('traceroute:route:abort', this._route);
       this._route.remove();
@@ -81,7 +77,6 @@ L.Handler.Trace = L.Handler.extend({
     switch(e.keyCode) {
       case 27 : //ESC
         this._finishRoute();
-        this.disable();
         break;
     }
   },

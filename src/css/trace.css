@@ -21,6 +21,9 @@
   content: "⊙";
   /* content: "◯"; */
 }
+.leaflet-control-traceroute-losange:before {
+  content: "◇";
+}
 .leaflet-control-traceroute-arrow:before {
   content: "➤";
   /* content: "➢"; */
