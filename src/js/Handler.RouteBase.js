@@ -13,14 +13,14 @@ L.Handler.RouteBase = L.Handler.extend({
 
     L.DomEvent
       .on(document, 'keydown', this._onKeyDown, this);
-    this._control._map
+    map
       .fire('traceroute:trace:start', this._control);
     this.startHandler.enable();
   },
   removeHooks: function() {
     L.DomEvent
       .off(document, 'keydown', this._onKeyDown, this);
-    this._control._map
+    map
       .fire('traceroute:trace:stop', this._control);
 
     this.target.style.filter = 'invert(0)';

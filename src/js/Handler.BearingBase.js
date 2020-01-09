@@ -1,6 +1,6 @@
 import './Handler.BearingTrace';
 
-L.Handler.BearingStart = L.Handler.extend({
+L.Handler.BearingBase = L.Handler.extend({
   initialize: function (control) {
     this._control = control;
     this.traceHandler = new L.Handler.BearingTrace(control);

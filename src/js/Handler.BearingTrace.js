@@ -5,9 +5,9 @@ L.Handler.BearingTrace = L.Handler.extend({
   },
   addHooks: function() {
     this._clearPointerTrace();
-    this._pointerTrace.addTo(this._control._map);
+    this._pointerTrace.addTo(map);
 
-    this._control._map
+    map
       .on('mousemove', this._drawPointerTrace, this)
       .on('click', this._setBearing, this);
     L.DomEvent
@@ -19,9 +19,9 @@ L.Handler.BearingTrace = L.Handler.extend({
   },
   removeHooks: function() {
     this._clearPointerTrace();
-    this._pointerTrace.removeFrom(this._control._map);
+    this._pointerTrace.removeFrom(map);
 
-    this._control._map
+    map
       .off('mousemove', this._drawPointerTrace, this)
       .off('click', this._setBearing, this);
 

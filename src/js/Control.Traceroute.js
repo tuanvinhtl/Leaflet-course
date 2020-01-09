@@ -18,10 +18,10 @@ L.Control.Traceroute = L.Control.extend({
     waypoint: {
       icon: L.divIcon({ className: 'leaflet-control-traceroute-icon', html: "<span class='leaflet-control-traceroute-point'></span>", iconAnchor: [20, 18], iconSize:[40, 40]}),
       popup: p => {
-        return L.Util.template("<strong>in :</strong> {in}<br /><strong>out :</strong> {out}<br /><strong>distance :</strong> +{distance}<br /><strong>Total distance :</strong> {totalDistance}", L.Control.Traceroute.extractData(p))
+        return L.Util.template("<strong>in :</strong> {in}<br /><strong>out :</strong> {out}<br /><strong>distance :</strong> +{distance}<br /><strong>Total distance :</strong> {totalDistance}", L.Control.Traceroute.extractData(p, 'waypoint'))
       },
       tooltip: p => {
-        return L.Util.template("<strong>in :</strong> {in}<br /><strong>out :</strong> {out}<br /><strong>distance :</strong> +{distance}", L.Control.Traceroute.extractData(p))
+        return L.Util.template("<strong>in :</strong> {in}<br /><strong>out :</strong> {out}<br /><strong>distance :</strong> +{distance}", L.Control.Traceroute.extractData(p, 'waypoint'))
       },
     },
     midpoint: {
@@ -36,7 +36,7 @@ L.Control.Traceroute = L.Control.extend({
     bearingpoint: {
       icon: L.divIcon({ className: 'leaflet-control-traceroute-icon', html: "<span class='leaflet-control-traceroute-losange'></span>", iconAnchor: [20, 18], iconSize:[40, 40]}),
       tooltip: p => {
-        return L.Util.template("<strong>QDR :</strong> {qdr}<br /><strong>QDM :</strong> {qdm}<br /><strong>distance :</strong> +{distance}", L.Control.Traceroute.extractData(p))
+        return L.Util.template("<strong>QDR :</strong> {qdr}<br /><strong>QDM :</strong> {qdm}<br /><strong>distance :</strong> +{distance}", L.Control.Traceroute.extractData(p, 'bearing'))
       },
     },
     bearings: {
@@ -57,7 +57,7 @@ L.Control.Traceroute = L.Control.extend({
     this.handlers = {
       base: new L.Handler.Traceroute(this),
       route: new L.Handler.RouteBase(this),
-      bearing:new L.Handler.BearingStart(this)
+      bearing:new L.Handler.BearingBase(this),
     };
   },
   onAdd: function(map) {
@@ -153,24 +153,28 @@ L.Control.Traceroute = L.Control.extend({
         case '°':
           return `${number.toFixed(1)}${unit}`
         case 'time':
-          return new Date(timestamp).toUTCString().slice(-12)
+          return new Date(number).toUTCString().slice(-12)
         default:
         unit = 'm'
         case 'm':
           return `${(number).toFixed(0)}${unit}`
         }
       },
-    extractData(waypoint) {
-      return {
-        out: this.format(waypoint.route.out, '°'),
-        in: this.format(waypoint.route.in, '°'),
-        distance: this.format(waypoint.route.distance, 'NM'),
-        totalDistance: this.format(waypoint.route.totalDistance, 'NM'),
-        altitude: this.format(waypoint.position.altitude, 'ft'),
-        latitude: this.format(waypoint.position.latitude, '°'),
-        longitude: this.format(waypoint.position.longitude, '°'),
-        qdr: this.format(waypoint.route.qdr, '°'),
-        qdm: this.format(waypoint.route.qdm, '°'),
+    extractData(layer, dataset) {
+      switch (dataset) {
+        case 'waypoint':
+          return {
+            out: this.format(layer.route.out, '°'),
+            in: this.format(layer.route.in, '°'),
+            distance: this.format(layer.route.distance, 'NM'),
+            totalDistance: this.format(layer.route.totalDistance, 'NM'),
+          }
+        case 'bearing':
+          return {
+            qdr: this.format(layer.bearing.qdr, '°'),
+            qdm: this.format(layer.bearing.qdm, '°'),
+            distance: this.format(layer.bearing.distance, 'NM'),
+          }
       }
     },
     // export(route) {

@@ -63,7 +63,7 @@
 
   map.on('traceroute:trace:start', debugEvent);
   map.on('traceroute:trace:stop', debugEvent);
-  // map.on('traceroute:update', debugEvent);
+  map.on('traceroute:update', debugEvent);
   map.on('traceroute:route:new', debugEvent);
   map.on('traceroute:route:finish', debugEvent);
   map.on('traceroute:route:abort', debugEvent);
@@ -74,5 +74,8 @@
   map.on('traceroute:waypoint:move', debugEvent);
   map.on('traceroute:waypoint:remove', debugEvent);
 
+  // map.on('traceroute:bearing:add', debugEvent);
+  // map.on('traceroute:bearing:move', debugEvent);
+  // map.on('traceroute:bearing:remove', debugEvent);
   </script>
 </html>

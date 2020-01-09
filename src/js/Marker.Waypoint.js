@@ -2,7 +2,6 @@ L.Marker.Traceroute = L.Marker.extend({
   initialize: function(latlng, options) {
     L.Marker.prototype.initialize.call(this, latlng, L.extend({ autoPan: true}, options));
   },
-  position: () => { return this._latlng },
   bearing: function(latlng) {
     // https://github.com/makinacorpus/Leaflet.GeometryUtil
     let rad = Math.PI / 180,
@@ -25,7 +24,6 @@ L.Marker.Waypoint = L.Marker.Traceroute.extend({
     L.Marker.Traceroute.prototype.initialize.call(this, latlng, options);
     this.route = { in: 0, out: 0, distance: 0, totalDistance:0 };
   },
-  data: {},
   // TODO: decorate should be here, need next prev method on ordered layer
   // _decorate: function(prev, next) {
   //
@@ -43,13 +41,12 @@ L.Marker.Waypoint = L.Marker.Traceroute.extend({
 L.Marker.Bearingpoint = L.Marker.Traceroute.extend({
   initialize: function(latlng, options) {
     L.Marker.Traceroute.prototype.initialize.call(this, latlng, options);
-    this.route = { qdr: 0, qdm: 0, distance: 0 };
 // TODO: bring bearing logic and trace inside Targetpoint
   },
-  _decorate: function() {
-    this.route.qdr = Number(this.bearing(this.options.origin.getLatLng()).toPrecision(5));
-    this.route.qdm = Number(this.options.origin.bearing(this._latlng).toPrecision(5));
-    this.route.distance = Number(this.distance(this.options.origin.getLatLng()).toPrecision(5));
+  decorate: function(origin) {
+    this.bearing.qdr = Number(this.bearing(origin.getLatLng()).toPrecision(5));
+    this.bearing.qdm = Number(origin.bearing(this._latlng).toPrecision(5));
+    this.bearing.distance = Number(this.distance(origin.getLatLng()).toPrecision(5));
     this.toggleTooltip().toggleTooltip();
     return this
   },

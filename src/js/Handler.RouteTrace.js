@@ -7,8 +7,8 @@ L.Handler.RouteTrace = L.Handler.extend({
   addHooks: function() {
     this._control.handlers.route.startHandler.disable();
     this._clearPointerTrace();
-    this._pointerTrace.addTo(this._control._map);
-    this._control._map
+    this._pointerTrace.addTo(map);
+    map
       .on('mousemove', this._drawPointerTrace, this)
       .on('click', this._createPoint, this);
     L.DomEvent
@@ -24,9 +24,9 @@ L.Handler.RouteTrace = L.Handler.extend({
   },
   removeHooks: function() {
     this._clearPointerTrace();
-    this._pointerTrace.removeFrom(this._control._map);
+    this._pointerTrace.removeFrom(map);
 
-    this._control._map
+    map
       .off('mousemove', this._drawPointerTrace, this)
       .off('click', this._createPoint, this);
     L.DomEvent
@@ -39,7 +39,7 @@ L.Handler.RouteTrace = L.Handler.extend({
     this._control.handlers.route.startHandler.enable();
   },
   _createRoute: function() {
-    this._control._map.fire('traceroute:route:new', this._route);
+    map.fire('traceroute:route:new', this._route);
     return this._route = new L.LayerGroup.Route([], this._control.options)
       .addTo(this._control._routes);
   },
@@ -56,10 +56,10 @@ L.Handler.RouteTrace = L.Handler.extend({
   },
   _finishRoute: function() {
     if (this._route.clean()) {
-      this._control._map.fire('traceroute:route:finish', this._route);
+      map.fire('traceroute:route:finish', this._route);
       this._route.editHandler.enable();
     } else {
-      this._control._map.fire('traceroute:route:abort', this._route);
+      map.fire('traceroute:route:abort', this._route);
       this._route.remove();
     }
     this.disable();

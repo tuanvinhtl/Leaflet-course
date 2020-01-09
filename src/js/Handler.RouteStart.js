@@ -7,7 +7,7 @@ L.Handler.RouteStart = L.Handler.extend({
     this.traceHandler = new L.Handler.RouteTrace(control);
   },
   addHooks: function() {
-    this._control._map
+    map
       .on('click', this._startRoute, this)
 
     this._control._routes.eachLayer(function(route) {
@@ -16,7 +16,7 @@ L.Handler.RouteStart = L.Handler.extend({
     }, this);
   },
   removeHooks: function() {
-    this._control._map
+    map
       .off('click', this._startRoute, this)
 
     this._control._routes.eachLayer(function(route) {

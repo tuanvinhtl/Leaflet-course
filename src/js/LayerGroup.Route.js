@@ -96,7 +96,7 @@ L.LayerGroup.Route = L.LayerGroup.extend({
     let traces = [];
     this.bearingpoints.eachLayer(function(bp) {
       traces.push([bp.getLatLng(), bp.options.origin.getLatLng()]);
-      bp._decorate();
+      bp.decorate(bp.options.origin);
     });
 
     this.bearings.setLatLngs(traces);
