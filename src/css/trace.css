@@ -17,14 +17,50 @@
   text-shadow: 4px 4px 3px grey;
 }
 
+/* Waypoint icon */
 .leaflet-control-traceroute-point:before {
   content: "⊙";
   /* content: "◯"; */
 }
+
+/* Bearing Target icon */
 .leaflet-control-traceroute-losange:before {
   content: "◇";
+}
+
+/* Midpoint icon */
+.leaflet-control-traceroute-arrow {
+  transform: rotateZ(-90deg);
 }
 .leaflet-control-traceroute-arrow:before {
   content: "➤";
   /* content: "➢"; */
+}
+
+/* Tracker icon */
+.leaflet-control-traceroute-airplane {
+  transform: rotateZ(-90deg);
+}
+.leaflet-control-traceroute-airplane:before {
+  content: "✈";
+}
+
+.leaflet-control-traceroute-helicopter:before {
+  content: "✇";
+  /*content: "⊛"; */
+}
+/* Alternative tracker icon */
+
+@keyframes revolution {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.leaflet-control-traceroute-helicopter {
+  animation-name: revolution;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+.leaflet-control-traceroute-helicopter:hover{
+  animation-play-state: paused;
 }

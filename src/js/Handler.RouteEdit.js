@@ -21,13 +21,6 @@ L.Handler.RouteEdit = L.Handler.extend({
       .off('contextmenu', this._removeLayer, this._route.waypoints)
       .eachLayer(layer => layer.dragging.disable());
   },
-  // _resumeRouteIfLast: function(e) {
-  //   if (e.layer === this._route.waypoints.last()) {
-  //     this.disable();
-  //     controle.traceRouteHandler.enable()
-  //     this._resumeRoute()
-  //   }
-  // },
   _removeLayer: function(e) {
     this.removeLayer(e.layer)
   },

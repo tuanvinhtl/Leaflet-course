@@ -1,3 +1,5 @@
+import 'leaflet-rotatedmarker'
+
 L.Marker.Traceroute = L.Marker.extend({
   initialize: function(latlng, options) {
     L.Marker.prototype.initialize.call(this, latlng, L.extend({ autoPan: true}, options));
@@ -50,4 +52,23 @@ L.Marker.Bearingpoint = L.Marker.Traceroute.extend({
     this.toggleTooltip().toggleTooltip();
     return this
   },
+});
+
+L.Marker.Trackpoint = L.Marker.Traceroute.extend({
+  decorate: function(e) {
+    this
+      ._extractLocation(e)
+      .setRotationAngle(e.heading || 0)
+      .toggleTooltip().toggleTooltip();
+  },
+  setHeading: function(latlng) {
+    if (typeof this.position.heading == 'undefined') {
+      this.position.heading = (this.bearing(latlng) -180) % 360;
+    }
+    this.setRotationAngle(this.position.heading)
+  },
+  _extractLocation: function(e) {
+    this.position = (({ latitude, longitude, altitude, accuracy, altitudeAccuracy, heading, speed, timestamp }) => ({ latitude, longitude, altitude, accuracy, altitudeAccuracy, heading, speed, timestamp }))(e)
+    return this
+  }
 });

@@ -10,7 +10,6 @@ module.exports = {
   context: path.resolve(__dirname, 'src'),
   entry: {
     traceroute: './js/Control.Traceroute.js',
-    trackroute: './js/Control.Trackroute.js'
   },
   output: {
     filename: 'leaflet-control-[name].js',
@@ -41,6 +40,7 @@ module.exports = {
     https: true,
     open: true,
     openPage: ['demo.html']
+    // openPage: ['webpack-dev-server/demo.html']
     // bonjour: true
   }
 };

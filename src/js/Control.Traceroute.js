@@ -4,6 +4,7 @@ import './LayerGroup.Route';
 import './Handler.Traceroute';
 import './Handler.RouteBase';
 import './Handler.BearingBase';
+import './Handler.TrackBase';
 import 'leaflet.geodesic';
 import '../css/trace.css';
 
@@ -13,6 +14,7 @@ L.Control.Traceroute = L.Control.extend({
       trace: ['☡', 'Start a route'], // ⥉
       clear: ['✗', 'Clear routes'], // ⥇
       bearing: ['∡', 'Radio Navigation'], // 🧭∢∠
+      track: ['✈', 'Track Position'], // ✇
     },
     pointerTrace: {dashArray: '8'},
     waypoint: {
@@ -25,7 +27,7 @@ L.Control.Traceroute = L.Control.extend({
       },
     },
     midpoint: {
-      icon: L.divIcon({ className: 'leaflet-control-traceroute-icon', html: L.DomUtil.create('div', 'leaflet-control-traceroute-arrow'), iconAnchor: [20, 18], iconSize:[40, 40]}),
+      icon: L.divIcon({ className: 'leaflet-control-traceroute-icon', html: "<div class='leaflet-control-traceroute-arrow'></div>", iconAnchor: [20, 18], iconSize:[40, 40]}),
       tooltip: 'Click to insert a waypoints here',
     },
     trace: {
@@ -44,6 +46,13 @@ L.Control.Traceroute = L.Control.extend({
       opacity: 0.3,
       color: 'grey',
     },
+    trackpoint: {
+      icon: L.divIcon({ className: 'leaflet-control-traceroute-icon', html: "<div class='leaflet-control-traceroute-airplane'></div>", iconAnchor: [20, 18], iconSize:[40, 40]}),
+      tooltip: p => {
+        return L.Util.template("<strong>accuracy :</strong> {accuracy}<br /><strong>altitude :</strong> {altitude}<br /><strong>heading :</strong> {heading}<br /><strong>speed :</strong> {speed}<br />last seen at <strong>{time}</strong>", L.Control.Traceroute.extractData(p, 'position'))
+      },
+    },
+    track: { enableHighAccuracy: true, timeout: 5000, maximumAge: 1 }
   },
   initialize: function (options) {
     // TODO: fix options merging for icons and other
@@ -58,6 +67,7 @@ L.Control.Traceroute = L.Control.extend({
       base: new L.Handler.Traceroute(this),
       route: new L.Handler.RouteBase(this),
       bearing:new L.Handler.BearingBase(this),
+      track:new L.Handler.TrackBase(this)
     };
   },
   onAdd: function(map) {
@@ -76,6 +86,11 @@ L.Control.Traceroute = L.Control.extend({
     if(this.options.control.bearing) {
       linksContainer.appendChild(
         this._createControl(...this.options.control.bearing, this._toggleMode(this.handlers.bearing))
+      );
+    }
+    if(this.options.control.track) {
+      linksContainer.appendChild(
+        this._createControl(...this.options.control.track, this._toggleMode(this.handlers.track))
       );
     }
     if(this.options.control.clear) {
@@ -174,6 +189,17 @@ L.Control.Traceroute = L.Control.extend({
             qdr: this.format(layer.bearing.qdr, '°'),
             qdm: this.format(layer.bearing.qdm, '°'),
             distance: this.format(layer.bearing.distance, 'NM'),
+          }
+        case 'position':
+          return {
+            latitude: this.format(layer.position.latitude, '°'),
+            longitude: this.format(layer.position.longitude, '°'),
+            altitude: this.format(layer.position.altitude, 'ft'),
+            accuracy: this.format(layer.position.accuracy, 'm'),
+            altitudeAccuracy: this.format(layer.position.altitudeAccuracy, 'm'),
+            heading: this.format(layer.position.heading, '°'),
+            speed: this.format(layer.position.speed, 'kt'),
+            time: this.format(layer.position.timestamp, 'time'),
           }
       }
     },

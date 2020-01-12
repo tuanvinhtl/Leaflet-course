@@ -75,6 +75,7 @@ L.LayerGroup.Route = L.LayerGroup.extend({
     }
   },
   createWaypoint: function(e) {
+    // FIXME: inserted new waypoint should be draggable
     let wp = new L.Marker.Waypoint(e.latlng,
       L.extend({ routeId: L.Util.stamp(this) }, this.options.waypoint)
     );
@@ -116,17 +117,15 @@ L.LayerGroup.Route = L.LayerGroup.extend({
       return current
       })
     }
-    this._mapToAdd.fire('traceroute:update', this);
+    this._mapToAdd.fire('traceroute:route:update', this);
   },
   _drawMidpoint: function(start, end) {
-    // TODO: orientation should be set in midpoint icon options
-    let brg = this.trace.geom.geodesic.inverse(start.getLatLng(), end.getLatLng());
-    this.options.midpoint.icon.options.html = this.options.midpoint.icon.options.html.cloneNode();
-    this.options.midpoint.icon.options.html.style.transform = `rotate(${Math.round(-90 + (brg.initialBearing + brg.finalBearing) / 2) % 360}deg)`;
+    let rotation = this.trace.geom.geodesic.inverse(start.getLatLng(), end.getLatLng());
+    rotation = Math.round((rotation.initialBearing + rotation.finalBearing) / 2) % 360;
 
     return new L.Marker(
       this.trace.geom.geodesic.midpoint(start.getLatLng(), end.getLatLng()),
-      L.extend({ routeId: L.Util.stamp(this), insertAfter : L.Util.stamp(start) }, this.options.midpoint))
+      L.extend({ rotationAngle: rotation, routeId: L.Util.stamp(this), insertAfter : L.Util.stamp(start) }, this.options.midpoint))
   },
   _decorateWaypoint: function(prev, next) {
     let params = this.trace.geom.geodesic.inverse(prev.getLatLng(), next.getLatLng());
