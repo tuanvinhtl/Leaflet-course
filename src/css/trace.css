@@ -45,11 +45,11 @@
   content: "✈";
 }
 
+/* Alternative tracker icon */
 .leaflet-control-traceroute-helicopter:before {
   content: "✇";
   /*content: "⊛"; */
 }
-/* Alternative tracker icon */
 
 @keyframes revolution {
   from { transform: rotate(0deg); }

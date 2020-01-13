@@ -1,8 +1,14 @@
 L.Handler.TrackBase = L.Handler.extend({
   initialize: function (control) {
     this._control = control;
+
+
     this.marker = new L.Marker.Trackpoint([],
       L.extend({ }, this._control.options.trackpoint))
+
+    this.reportedpoints = new L.FeatureGroup.Ordered()
+      .bindTooltip(this.marker.options.tooltip, { direction: 'auto' })
+
     this.trace = new L.Polyline([], this._control.options.trace)
     this.circle = new L.Circle([], this._control.options.trackcircle)
   },
@@ -27,12 +33,12 @@ L.Handler.TrackBase = L.Handler.extend({
   },
   _locationFound: function(e) {
       let estimated =  {}
-      try {
-        estimated = {
-          heading: (this.marker.bearing(e.latlng)),
-          speed: this.marker.distance(e.latlng) / (e.timestamp - this.marker.position.timestamp)
-        }
-      } catch {}
+      if (map.hasLayer(this.marker)) {
+          estimated = {
+            heading: (this.marker.bearing(e.latlng)),
+            speed: this.marker.distance(e.latlng) / Math.floor((e.timestamp - this.marker.position.timestamp)/1000)
+          }
+      }
 
     this.marker
       .setLatLng(e.latlng)
