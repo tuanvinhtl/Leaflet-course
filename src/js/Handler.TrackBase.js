@@ -35,7 +35,7 @@ L.Handler.TrackBase = L.Handler.extend({
       let estimated =  {}
       if (map.hasLayer(this.marker)) {
           estimated = {
-            heading: (this.marker.bearing(e.latlng)),
+            bearing: (this.marker.bearing(e.latlng)),
             speed: this.marker.distance(e.latlng) / Math.floor((e.timestamp - this.marker.position.timestamp)/1000)
           }
       }

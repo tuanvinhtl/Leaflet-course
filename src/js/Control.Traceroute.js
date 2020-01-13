@@ -49,7 +49,7 @@ L.Control.Traceroute = L.Control.extend({
     trackpoint: {
       icon: L.divIcon({ className: 'leaflet-control-traceroute-icon', html: "<div class='leaflet-control-traceroute-airplane'></div>", iconAnchor: [20, 18], iconSize:[40, 40]}),
       tooltip: p => {
-        return L.Util.template("<strong>accuracy :</strong> {accuracy}<br /><strong>altitude :</strong> {altitude}<br /><strong>heading :</strong> {heading}<br /><strong>speed :</strong> {speed}<br />last seen at <strong>{time}</strong>", L.Control.Traceroute.extractData(p, 'position'))
+        return L.Util.template("<strong>accuracy :</strong> {accuracy}<br /><strong>altitude :</strong> {altitude}<br /><strong>heading :</strong> {heading}<br /><strong>bearing :</strong> {bearing}<br /><strong>speed :</strong> {speed}<br />last seen at <strong>{time}</strong>", L.Control.Traceroute.extractData(p, 'position'))
       },
     },
     track: { enableHighAccuracy: true, timeout: 5000, maximumAge: 1 }
@@ -198,6 +198,7 @@ L.Control.Traceroute = L.Control.extend({
             accuracy: this.format(layer.position.accuracy, 'm'),
             altitudeAccuracy: this.format(layer.position.altitudeAccuracy, 'm'),
             heading: this.format(layer.position.heading, '°'),
+            bearing: this.format(layer.position.bearing, '°'),
             speed: this.format(layer.position.speed, 'kt'),
             time: this.format(layer.position.timestamp, 'time'),
           }

@@ -68,7 +68,7 @@ L.Marker.Trackpoint = L.Marker.Traceroute.extend({
     this.setRotationAngle(this.position.heading)
   },
   _extractLocation: function(e) {
-    this.position = (({ latitude, longitude, altitude, accuracy, altitudeAccuracy, heading, speed, timestamp }) => ({ latitude, longitude, altitude, accuracy, altitudeAccuracy, heading, speed, timestamp }))(e)
+    this.position = (({ latitude, longitude, altitude, accuracy, altitudeAccuracy, heading, bearing, speed, timestamp }) => ({ latitude, longitude, altitude, accuracy, altitudeAccuracy, heading, bearing, speed, timestamp }))(e)
     return this
   }
 });

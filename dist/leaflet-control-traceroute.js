@@ -689,7 +689,7 @@ L.Control.Traceroute = L.Control.extend({
     trackpoint: {
       icon: L.divIcon({ className: 'leaflet-control-traceroute-icon', html: "<div class='leaflet-control-traceroute-airplane'></div>", iconAnchor: [20, 18], iconSize:[40, 40]}),
       tooltip: p => {
-        return L.Util.template("<strong>accuracy :</strong> {accuracy}<br /><strong>altitude :</strong> {altitude}<br /><strong>heading :</strong> {heading}<br /><strong>speed :</strong> {speed}<br />last seen at <strong>{time}</strong>", L.Control.Traceroute.extractData(p, 'position'))
+        return L.Util.template("<strong>accuracy :</strong> {accuracy}<br /><strong>altitude :</strong> {altitude}<br /><strong>heading :</strong> {heading}<br /><strong>bearing :</strong> {bearing}<br /><strong>speed :</strong> {speed}<br />last seen at <strong>{time}</strong>", L.Control.Traceroute.extractData(p, 'position'))
       },
     },
     track: { enableHighAccuracy: true, timeout: 5000, maximumAge: 1 }
@@ -838,6 +838,7 @@ L.Control.Traceroute = L.Control.extend({
             accuracy: this.format(layer.position.accuracy, 'm'),
             altitudeAccuracy: this.format(layer.position.altitudeAccuracy, 'm'),
             heading: this.format(layer.position.heading, '°'),
+            bearing: this.format(layer.position.bearing, '°'),
             speed: this.format(layer.position.speed, 'kt'),
             time: this.format(layer.position.timestamp, 'time'),
           }
@@ -1392,7 +1393,7 @@ L.Handler.Traceroute = L.Handler.extend({
       let estimated =  {}
       if (map.hasLayer(this.marker)) {
           estimated = {
-            heading: (this.marker.bearing(e.latlng)),
+            bearing: (this.marker.bearing(e.latlng)),
             speed: this.marker.distance(e.latlng) / Math.floor((e.timestamp - this.marker.position.timestamp)/1000)
           }
       }
@@ -1779,7 +1780,7 @@ L.Marker.Trackpoint = L.Marker.Traceroute.extend({
   //   this.setRotationAngle(this.position.heading)
   // },
   _extractLocation: function(e) {
-    this.position = (({ latitude, longitude, altitude, accuracy, altitudeAccuracy, heading, speed, timestamp }) => ({ latitude, longitude, altitude, accuracy, altitudeAccuracy, heading, speed, timestamp }))(e)
+    this.position = (({ latitude, longitude, altitude, accuracy, altitudeAccuracy, heading, bearing, speed, timestamp }) => ({ latitude, longitude, altitude, accuracy, altitudeAccuracy, heading, bearing, speed, timestamp }))(e)
     return this
   }
 });
