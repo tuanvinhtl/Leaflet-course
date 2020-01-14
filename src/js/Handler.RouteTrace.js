@@ -5,7 +5,7 @@ L.Handler.RouteTrace = L.Handler.extend({
     this._pointerTrace = new L.Geodesic([], this._control.options.pointerTrace);
   },
   addHooks: function() {
-    this._control.handlers.route.startHandler.disable();
+    this._control.options.tools.route.handler.startHandler.disable();
     this._clearPointerTrace();
     this._pointerTrace.addTo(map);
     map
@@ -36,7 +36,7 @@ L.Handler.RouteTrace = L.Handler.extend({
       .off('click', this._finishRouteIfLast, this);
 
     this._route = null;
-    this._control.handlers.route.startHandler.enable();
+    this._control.options.tools.route.handler.startHandler.enable();
   },
   _createRoute: function() {
     map.fire('traceroute:route:new', this._route);

@@ -5,16 +5,33 @@ import './Handler.Traceroute';
 import './Handler.RouteBase';
 import './Handler.BearingBase';
 import './Handler.TrackBase';
+import './Handler.ClearBase';
 import 'leaflet.geodesic';
 import '../css/trace.css';
 
 L.Control.Traceroute = L.Control.extend({
   options: {
-    control: {
-      trace: ['☡', 'Start a route'], // ⥉
-      clear: ['✗', 'Clear routes'], // ⥇
-      bearing: ['∡', 'Radio Navigation'], // 🧭∢∠
-      track: ['✈', 'Track Position'], // ✇
+    tools: {
+      route: {
+        icon: '☡',// ⥉
+        title: 'Start a route',
+        handler: L.Handler.RouteBase
+      },
+      bearing: {
+        icon: '∡',// 🧭∢∠
+        title: 'Radio Navigation',
+        handler: L.Handler.BearingBase
+      },
+      track: {
+        icon: '✈',// ✇
+        title: 'Track Position',
+        handler: L.Handler.TrackBase
+      },
+      clear: {
+        icon: '✗',// ⥇
+        title: 'Clear routes',
+        handler: L.Handler.ClearBase
+      },
     },
     pointerTrace: {dashArray: '8'},
     waypoint: {
@@ -56,6 +73,7 @@ L.Control.Traceroute = L.Control.extend({
   },
   initialize: function (options) {
     // TODO: fix options merging for icons and other
+    // FIXME Make a deep merge of the options
     for (let [key, value] of Object.entries(this.options)) {
       if (options.hasOwnProperty(key)) {
         L.extend(options[key], value);
@@ -63,12 +81,12 @@ L.Control.Traceroute = L.Control.extend({
     }
     L.Util.setOptions(this, options);
 
-    this.handlers = {
-      base: new L.Handler.Traceroute(this),
-      route: new L.Handler.RouteBase(this),
-      bearing:new L.Handler.BearingBase(this),
-      track:new L.Handler.TrackBase(this)
-    };
+    this.handler = new L.Handler.Traceroute(this);
+
+    for (const tool in this.options.tools) {
+      this.options.tools[tool].handler = new this.options.tools[tool].handler(this);
+    }
+
   },
   onAdd: function(map) {
     this._map = map;
@@ -78,24 +96,9 @@ L.Control.Traceroute = L.Control.extend({
     linksContainer.classList.add('leaflet-bar');
     L.DomEvent.disableClickPropagation(linksContainer);
 
-    if(this.options.control.trace) {
+    for (const tool in this.options.tools) {
       linksContainer.appendChild(
-        this._createControl(...this.options.control.trace, this._toggleMode(this.handlers.route))
-      );
-    }
-    if(this.options.control.bearing) {
-      linksContainer.appendChild(
-        this._createControl(...this.options.control.bearing, this._toggleMode(this.handlers.bearing))
-      );
-    }
-    if(this.options.control.track) {
-      linksContainer.appendChild(
-        this._createControl(...this.options.control.track, this._toggleMode(this.handlers.track))
-      );
-    }
-    if(this.options.control.clear) {
-      linksContainer.appendChild(
-        this._createControl(...this.options.control.clear, this.clear)
+        this._createControl(this.options.tools[tool].icon, this.options.tools[tool].title, this._toggleMode(this.options.tools[tool].handler))
       );
     }
 

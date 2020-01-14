@@ -6,8 +6,8 @@ L.Handler.BearingBase = L.Handler.extend({
     this.traceHandler = new L.Handler.BearingTrace(control);
   },
   addHooks: function() {
-    this._control.handlers.route.disable();
-    this._control.handlers.base.enable();
+    this._control.options.tools.route.handler.disable();
+    this._control.handler.enable();
     this.target.style.filter = 'invert(1)';
 
     this._control._routes.eachLayer(function(route) {
@@ -27,7 +27,7 @@ L.Handler.BearingBase = L.Handler.extend({
       route.bearingpoints.eachLayer(layer => layer.dragging.disable());
     }, this);
 
-    this._control.handlers.base.disable();
+    this._control.handler.disable();
     this.target.style.filter = 'invert(0)';
 
     this.traceHandler.disable();

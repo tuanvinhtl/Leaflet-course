@@ -7,8 +7,8 @@ L.Handler.RouteBase = L.Handler.extend({
     this.startHandler = new L.Handler.RouteStart(control);
   },
   addHooks: function() {
-    this._control.handlers.bearing.disable();
-    this._control.handlers.base.enable();
+    this._control.options.tools.bearing.handler.disable();
+    this._control.handler.enable();
     this.target.style.filter = 'invert(1)';
 
     L.DomEvent
@@ -24,7 +24,7 @@ L.Handler.RouteBase = L.Handler.extend({
       .fire('traceroute:trace:stop', this._control);
 
     this.target.style.filter = 'invert(0)';
-    this._control.handlers.base.disable();
+    this._control.handler.disable();
     this.startHandler.traceHandler.disable();
     this.startHandler.disable();
   },
