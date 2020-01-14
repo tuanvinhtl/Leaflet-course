@@ -3,28 +3,15 @@ L.Handler.ClearBase = L.Handler.extend({
     this._control = control;
   },
   addHooks: function() {
+    this.target.style.filter = 'invert(1)';
     this._control._routes.clearLayers();
+    this._control.options.tools.track.handler.trace.setLatLngs([]);
     map.fire('traceroute:clear');
-
-    // let anyEnabled = false;
-    // for (const tool in this._control.tools) {
-    //   let handler = this._control.tools[tool].handler;
-    //   console.log(handler);
-    //   if (handler.enabled()) {
-    //     handler.clear();
-    //     anyEnabled = true;
-    //   }
-    // }
-    //
-    // if(!anyEnabled) {
-    //   for (const tool in this._control.tools) {
-    //     this._control.tools[tool].handler.clear();
-    //   }
-    // }
 
     this.disable();
   },
   removeHooks: function() {
+    this.target.style.filter = 'invert(0)';
     return false;
   },
 });

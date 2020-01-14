@@ -31,13 +31,9 @@ L.LayerGroup.Route = L.LayerGroup.extend({
       .addTo(this);
 
     this.midpoints = new L.FeatureGroup()
-      .bindTooltip(this.options.midpoint.tooltip, { direction: 'auto' })
       .addTo(this);
 
     this.waypoints = new L.FeatureGroup.Ordered()
-      .bindPopup(this.options.waypoint.popup)
-    // FIXME: Tooltip Error: Unable to get source layer LatLng. with permanent: true, : https://github.com/Leaflet/Leaflet/issues/6938
-      .bindTooltip(this.options.waypoint.tooltip, { direction: 'auto' })
       .on('layerremove', this.clean, this)
       .on('layeradd layerremove move', this.drawTrace, this)
       .on('layeradd layerremove move', this.drawBearings, this)

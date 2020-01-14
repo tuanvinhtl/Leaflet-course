@@ -62,8 +62,8 @@
     console.debug(e.type, e);
   }
 
-  map.on('traceroute:trace:start', debugEvent);
-  map.on('traceroute:trace:stop', debugEvent);
+  map.on('traceroute:route:start', debugEvent);
+  map.on('traceroute:route:stop', debugEvent);
   map.on('traceroute:route:update', debugEvent);
   map.on('traceroute:route:new', debugEvent);
   map.on('traceroute:route:finish', debugEvent);
