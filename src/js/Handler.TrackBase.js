@@ -2,12 +2,9 @@ L.Handler.TrackBase = L.Handler.extend({
   initialize: function (control) {
     this._control = control;
 
-
     this.marker = new L.Marker.Trackpoint([],
       L.extend({ }, this._control.options.trackpoint))
-
-    this.reportedpoints = new L.FeatureGroup.Ordered()
-      .bindTooltip(this.marker.options.tooltip, { direction: 'auto' })
+      .bindTooltip(this._control.options.trackpoint.tooltip, { direction: 'auto' })
 
     this.trace = new L.Polyline([], this._control.options.trace)
     this.circle = new L.Circle([], this._control.options.trackcircle)
@@ -36,7 +33,8 @@ L.Handler.TrackBase = L.Handler.extend({
       if (map.hasLayer(this.marker)) {
           estimated = {
             bearing: (this.marker.bearing(e.latlng)),
-            speed: this.marker.distance(e.latlng) / Math.floor((e.timestamp - this.marker.position.timestamp)/1000)
+            estimatedSpeed: this.marker.distance(e.latlng) / Math.floor((e.timestamp - this.marker.position.timestamp)/1000),
+            vario: (this.marker.position.altitude - e.altitude) / Math.floor((e.timestamp - this.marker.position.timestamp)/1000)
           }
       }
 
@@ -44,7 +42,7 @@ L.Handler.TrackBase = L.Handler.extend({
       .setLatLng(e.latlng)
       .addTo(map)
       .setOpacity(1)
-      .bindTooltip(this.marker.options.tooltip, { direction: 'auto' })
+      // .bindTooltip(this.marker.options.tooltip, { direction: 'auto' })
       .decorate(L.extend(estimated, e))
 
     this.circle
@@ -59,9 +57,10 @@ L.Handler.TrackBase = L.Handler.extend({
       .fire('traceroute:track:found', e)
   },
   _locationError: function(e) {
+    // Start a new polyine segment
     this.marker
       .setOpacity(0.5)
-      .bindTooltip('Location lost', { direction: 'auto' })
+      // .bindTooltip('Location lost', { direction: 'auto' })
       .addTo(map);
   }
 });

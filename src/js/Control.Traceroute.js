@@ -66,10 +66,10 @@ L.Control.Traceroute = L.Control.extend({
     trackpoint: {
       icon: L.divIcon({ className: 'leaflet-control-traceroute-icon', html: "<div class='leaflet-control-traceroute-airplane'></div>", iconAnchor: [20, 18], iconSize:[40, 40]}),
       tooltip: p => {
-        return L.Util.template("<strong>accuracy :</strong> {accuracy}<br /><strong>altitude :</strong> {altitude}<br /><strong>heading :</strong> {heading}<br /><strong>bearing :</strong> {bearing}<br /><strong>speed :</strong> {speed}<br />last seen at <strong>{time}</strong>", L.Control.Traceroute.extractData(p, 'position'))
+        return L.Util.template("<strong>accuracy :</strong> {accuracy}<br /><strong>altitude (+/-{altitudeAccuracy}):</strong> {altitude} ({vario}) <br /><strong>heading :</strong> {heading} ({bearing})<br /><strong>speed :</strong> {speed} ({estimatedSpeed})<br />last seen at <strong>{time}</strong>", L.Control.Traceroute.extractData(p, 'position'))
       },
     },
-    track: { enableHighAccuracy: true, timeout: 5000, maximumAge: 1 }
+    track: { enableHighAccuracy: true, timeout: 5000, maximumAge: 0, setView: true }
   },
   initialize: function (options) {
     // TODO: fix options merging for icons and other
@@ -148,6 +148,9 @@ L.Control.Traceroute = L.Control.extend({
       const one_NM = 1852;
       const one_mi = 1609.344;
       const one_ft = 0.3048;
+      const one_min = 60;
+      const one_hour = 3600;
+      const one_kilo = 1000;
 
       if (typeof number !== 'number') {
         return `- ${unit}`
@@ -156,21 +159,23 @@ L.Control.Traceroute = L.Control.extend({
       }
 
       switch (unit) {
-        case 'km':
-          return `${(number/1000).toFixed(1)}${unit}`
-        case 'mi':
+        case 'km': // from m
+          return `${(number/one_kilo).toFixed(1)}${unit}`
+        case 'mi': // from m
           return `${(number/one_mi).toFixed(1)}${unit}`
-        case 'NM':
+        case 'NM': // from m
           return `${(number/one_NM).toFixed(1)}${unit}`
-        case 'km/h':
-          return `${(number/1000*60*60).toFixed(0)}${unit}`
-        case 'kt':
-          return `${(number/one_NM*60*60).toFixed(0)}${unit}`
-        case 'ft':
+        case 'km/h': //from m/s
+          return `${(number/one_kilo*one_hour).toFixed(0)}${unit}`
+        case 'ft/min': // from m/s
+          return `${(number/one_ft*one_min).toFixed(0)}${unit}`
+        case 'kt': // from m/s
+          return `${(number/one_NM*one_hour).toFixed(0)}${unit}`
+        case 'ft': // from m
           return `${(number/one_ft).toFixed(0)}${unit}`
         case '°':
           return `${number.toFixed(1)}${unit}`
-        case 'time':
+        case 'time': // from timestamp
           return new Date(number).toUTCString().slice(-12)
         default:
         unit = 'm'
@@ -198,11 +203,13 @@ L.Control.Traceroute = L.Control.extend({
             latitude: this.format(layer.position.latitude, '°'),
             longitude: this.format(layer.position.longitude, '°'),
             altitude: this.format(layer.position.altitude, 'ft'),
+            vario: this.format(layer.position.vario, 'ft/min'),
             accuracy: this.format(layer.position.accuracy, 'm'),
             altitudeAccuracy: this.format(layer.position.altitudeAccuracy, 'm'),
             heading: this.format(layer.position.heading, '°'),
             bearing: this.format(layer.position.bearing, '°'),
             speed: this.format(layer.position.speed, 'kt'),
+            estimatedSpeed: this.format(layer.position.estimatedSpeed, 'kt'),
             time: this.format(layer.position.timestamp, 'time'),
           }
       }

@@ -61,14 +61,14 @@ L.Marker.Trackpoint = L.Marker.Traceroute.extend({
       .setRotationAngle(e.heading || 0)
       .toggleTooltip().toggleTooltip();
   },
-  setHeading: function(latlng) {
-    if (typeof this.position.heading == 'undefined') {
-      this.position.heading = (this.bearing(latlng) -180) % 360;
-    }
-    this.setRotationAngle(this.position.heading)
-  },
+  // setHeading: function(latlng) {
+  //   if (typeof this.position.heading == 'undefined') {
+  //     this.position.heading = (this.bearing(latlng) -180) % 360;
+  //   }
+  //   this.setRotationAngle(this.position.heading)
+  // },
   _extractLocation: function(e) {
-    this.position = (({ latitude, longitude, altitude, accuracy, altitudeAccuracy, heading, bearing, speed, timestamp }) => ({ latitude, longitude, altitude, accuracy, altitudeAccuracy, heading, bearing, speed, timestamp }))(e)
+    this.position = (({ latitude, longitude, altitude, vario, accuracy, altitudeAccuracy, heading, bearing, estimatedSpeed, speed, timestamp }) => ({ latitude, longitude, altitude, vario, accuracy, altitudeAccuracy, heading, bearing, estimatedSpeed, speed, timestamp }))(e)
     return this
   }
 });
