@@ -1,5 +1,6 @@
 L.Handler.ClearBase = L.Handler.extend({
-  initialize: function (control) {
+  initialize: function (control, options) {
+    L.Util.setOptions(this, options);
     this._control = control;
   },
   addHooks: function() {

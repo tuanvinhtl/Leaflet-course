@@ -1,9 +1,17 @@
 import './Handler.BearingTrace';
 
 L.Handler.BearingBase = L.Handler.extend({
-  initialize: function (control) {
+  initialize: function (control, options) {
+    L.Util.setOptions(this, options);
     this._control = control;
-    this.traceHandler = new L.Handler.BearingTrace(control);
+
+    this.bearings = new L.FeatureGroup()
+      .addTo(map);
+
+    this.traces = new L.Polyline([], this.options.trace)
+      .addTo(map);
+
+    this.traceHandler = new L.Handler.BearingTrace(this.bearings, this.options);
   },
   addHooks: function() {
     this._control.options.tools.route.handler.disable();
@@ -12,8 +20,12 @@ L.Handler.BearingBase = L.Handler.extend({
 
     this._control._routes.eachLayer(function(route) {
       route.waypoints.on('click', this._selectOrigin, this)
-      route.bearingpoints.eachLayer(layer => layer.dragging.enable());
     }, this);
+
+    this.bearings
+      .bindTooltip(this.options.marker.tooltip, { direction: 'auto' })
+      .unbindPopup()
+      .eachLayer(marker => marker.dragging.enable());
 
     L.DomEvent
       .on(document, 'keydown', this._onKeyDown, this);
@@ -22,9 +34,13 @@ L.Handler.BearingBase = L.Handler.extend({
     L.DomEvent
       .off(document, 'keydown', this._onKeyDown, this);
 
+      this.bearings
+        .bindPopup(this.options.marker.tooltip, { direction: 'auto' })
+        .unbindTooltip()
+        .eachLayer(marker => marker.dragging.disable());
+
     this._control._routes.eachLayer(function(route) {
       route.waypoints.off('click', this._selectOrigin, this)
-      route.bearingpoints.eachLayer(layer => layer.dragging.disable());
     }, this);
 
     this._control.handler.disable();

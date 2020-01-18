@@ -2,9 +2,13 @@ import './Handler.RouteStart';
 
 // Handle while waiting to start/resume a route
 L.Handler.RouteBase = L.Handler.extend({
-  initialize: function (control) {
-    this._control = control;
-    this.startHandler = new L.Handler.RouteStart(control);
+  initialize: function (control, options) {
+    L.Util.setOptions(this, options);
+    this._control = control; // only for handlers (Base and Bearing)
+// TODO: Send _routes here
+  // this._routes = L.layerGroup()
+  //   .addTo(map);
+    this.startHandler = new L.Handler.RouteStart(control._routes, options);
   },
   addHooks: function() {
     this._control.options.tools.bearing.handler.disable();

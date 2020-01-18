@@ -1,15 +1,19 @@
 L.Handler.BearingTrace = L.Handler.extend({
-  initialize: function (control) {
-    this._control = control;
-    this._pointerTrace = new L.Polyline([], this._control.options.pointerTrace);
+  initialize: function (bearings, options) {
+    L.Util.setOptions(this, options);
+
+    this.bearings = bearings;
+    this._pointer = new L.Polyline([], options.pointer);
   },
   addHooks: function() {
-    this._clearPointerTrace();
-    this._pointerTrace.addTo(map);
+    this._clearPointer();
+    this._pointer
+      .addTo(map);
 
     map
-      .on('mousemove', this._drawPointerTrace, this)
+      .on('mousemove', this._drawPointer, this)
       .on('click', this._setBearing, this);
+
     L.DomEvent
       .on(document, 'keydown', this._onKeyDown, this);
 
@@ -18,11 +22,12 @@ L.Handler.BearingTrace = L.Handler.extend({
     }
   },
   removeHooks: function() {
-    this._clearPointerTrace();
-    this._pointerTrace.removeFrom(map);
+    this._clearPointer();
+    this._pointer
+      .removeFrom(map);
 
     map
-      .off('mousemove', this._drawPointerTrace, this)
+      .off('mousemove', this._drawPointer, this)
       .off('click', this._setBearing, this);
 
     L.DomEvent
@@ -31,18 +36,18 @@ L.Handler.BearingTrace = L.Handler.extend({
     this.origin = null;
   },
   _setBearing: function(e) {
-    let bp = this._control._routes
-      .getLayer(this.origin.options.routeId)
-        .createBearing(e.latlng, this.origin);
+    new L.Marker.Bearing(e.latlng, L.extend({ draggable:true }, this.options.marker, { trace: this.options.trace }) )
+      .setOrigin(this.origin)
+      .addTo(this.bearings);
 
-    bp.dragging.enable();
+    // this.origin.on('move', this._updateOrigin)
     this.disable();
   },
-  _drawPointerTrace: function(e) {
-    this._pointerTrace.setLatLngs([this.origin.getLatLng(), e.latlng]);
+  _drawPointer: function(e) {
+    this._pointer.setLatLngs([this.origin.getLatLng(), e.latlng]);
   },
-  _clearPointerTrace: function() {
-    this._pointerTrace.setLatLngs([]);
+  _clearPointer: function() {
+    this._pointer.setLatLngs([]);
   },
   _onKeyDown: function(e) {
     switch(e.keyCode) {

@@ -1,11 +1,13 @@
 // Handle interactions while adding Waypoints one after another.
 L.Handler.RouteTrace = L.Handler.extend({
-  initialize: function (control) {
-    this._control = control;
-    this._pointerTrace = new L.Geodesic([], this._control.options.pointerTrace);
+  initialize: function(parent, routes, options) {
+    L.Util.setOptions(this, options);
+    this._parent = parent;
+    this._routes = routes;
+    this._pointerTrace = new L.Geodesic([], options.pointer);
   },
   addHooks: function() {
-    this._control.options.tools.route.handler.startHandler.disable();
+    this._parent.disable();
     this._clearPointerTrace();
     this._pointerTrace.addTo(map);
     map
@@ -36,12 +38,12 @@ L.Handler.RouteTrace = L.Handler.extend({
       .off('click', this._finishRouteIfLast, this);
 
     this._route = null;
-    this._control.options.tools.route.handler.startHandler.enable();
+    this._parent.enable();
   },
   _createRoute: function() {
     map.fire('traceroute:route:new', this._route);
-    return this._route = new L.LayerGroup.Route([], this._control.options)
-      .addTo(this._control._routes);
+    return this._route = new L.LayerGroup.Route([], this.options)
+      .addTo(this._routes);
   },
   _createPoint: function(e) {
     if (!this._route) {

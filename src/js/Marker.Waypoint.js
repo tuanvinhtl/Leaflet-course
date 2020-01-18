@@ -1,10 +1,10 @@
 import 'leaflet-rotatedmarker'
 
 L.Marker.Traceroute = L.Marker.extend({
-  initialize: function(latlng, options) {
-    L.Marker.prototype.initialize.call(this, latlng, L.extend({ autoPan: true}, options));
+  options: {
+    autoPan: true
   },
-  bearing: function(latlng) {
+  bearingTo: function(latlng) {
     // https://github.com/makinacorpus/Leaflet.GeometryUtil
     let rad = Math.PI / 180,
         lat1 = this._latlng.lat * rad,
@@ -16,15 +16,18 @@ L.Marker.Traceroute = L.Marker.extend({
             Math.sin(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1);
     return ((Math.atan2(y, x) * 180 / Math.PI) + 360) % 360;
   },
-  distance: function (latlng) {
-    return this._map.distance(this._latlng, latlng);
+  distanceTo: function (latlng) {
+    return map.distance(this._latlng, latlng);
   },
 });
 
 L.Marker.Waypoint = L.Marker.Traceroute.extend({
-  initialize: function(latlng, options) {
-    L.Marker.Traceroute.prototype.initialize.call(this, latlng, options);
-    this.route = { in: 0, out: 0, distance: 0, totalDistance:0 };
+  route: { in: 0, out: 0, distance: 0, totalDistance: 0 },
+  bearings: [],
+  addBearing: function(bearing) {
+    this.bearings.push(bearing)
+    bearing.origin = this;
+    return this;
   },
   // TODO: decorate should be here, need next prev method on ordered layer
   // _decorate: function(prev, next) {
@@ -40,16 +43,50 @@ L.Marker.Waypoint = L.Marker.Traceroute.extend({
   // },
 });
 
-L.Marker.Bearingpoint = L.Marker.Traceroute.extend({
+L.Marker.Bearing = L.Marker.Traceroute.extend({
   initialize: function(latlng, options) {
-    L.Marker.Traceroute.prototype.initialize.call(this, latlng, options);
-// TODO: bring bearing logic and trace inside Targetpoint
+    this.trace = new L.Polyline([], options.trace);
+    delete options.trace;
+
+    this
+      .on('move', this._decorate, this)
+      .on('move', this._draw, this)
+
+    Object.getPrototypeOf(Object.getPrototypeOf(this)).initialize.call(this, latlng, options);
   },
-  decorate: function(origin) {
-    this.bearing.qdr = Number(this.bearing(origin.getLatLng()).toPrecision(5));
-    this.bearing.qdm = Number(origin.bearing(this._latlng).toPrecision(5));
-    this.bearing.distance = Number(this.distance(origin.getLatLng()).toPrecision(5));
+  onAdd: function(map) {
+    this.trace.addTo(map);
+    Object.getPrototypeOf(Object.getPrototypeOf(this)).onAdd.call(this, map);
+  },
+  onRemove: function(map) {
+    this.trace.remove();
+    Object.getPrototypeOf(Object.getPrototypeOf(this)).onRemove.call(this, map);
+  },
+  bearing: {},
+  setOrigin: function(origin) {
+    this.origin = origin;
+    origin
+      .on('remove', this.remove, this)
+      .on('move remove', this._decorate, this)
+      .on('move remove', this._draw, this)
+      .bearings.push(this);
+    this
+      ._decorate()
+      ._draw();
+    return this;
+  },
+  // TODO: assert if removeOrgin() could be useful.
+  _decorate: function() {
+    if (this.origin instanceof L.Marker.Waypoint) {
+      this.bearing.qdr = Number(this.bearingTo(this.origin.getLatLng()).toPrecision(5));
+      this.bearing.qdm = Number(this.origin.bearingTo(this._latlng).toPrecision(5));
+      this.bearing.distance = Number(this.distanceTo(this.origin.getLatLng()).toPrecision(5));
+    }
     this.toggleTooltip().toggleTooltip();
+    return this
+  },
+  _draw: function() {
+    this.trace.setLatLngs([this._latlng, this.origin.getLatLng()])
     return this
   },
 });
@@ -63,7 +100,7 @@ L.Marker.Trackpoint = L.Marker.Traceroute.extend({
   },
   // setHeading: function(latlng) {
   //   if (typeof this.position.heading == 'undefined') {
-  //     this.position.heading = (this.bearing(latlng) -180) % 360;
+  //     this.position.heading = (this.bearingTo(latlng) -180) % 360;
   //   }
   //   this.setRotationAngle(this.position.heading)
   // },

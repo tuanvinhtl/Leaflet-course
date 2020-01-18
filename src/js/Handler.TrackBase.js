@@ -1,13 +1,14 @@
 L.Handler.TrackBase = L.Handler.extend({
-  initialize: function (control) {
+  initialize: function (control, options) {
+    L.Util.setOptions(this, options);
     this._control = control;
 
     this.marker = new L.Marker.Trackpoint([],
-      L.extend({ }, this._control.options.trackpoint))
-      .bindTooltip(this._control.options.trackpoint.tooltip, { direction: 'auto' })
+      L.extend({ }, this.options.marker))
+      .bindTooltip(this.options.marker.tooltip, { direction: 'auto' })
 
-    this.trace = new L.Polyline([], this._control.options.trace)
-    this.circle = new L.Circle([], this._control.options.trackcircle)
+    this.trace = new L.Polyline([], this.options.trace)
+    this.circle = new L.Circle([], this.options.circle)
   },
   addHooks: function() {
     this.target.style.filter = 'invert(1)';
@@ -15,7 +16,7 @@ L.Handler.TrackBase = L.Handler.extend({
     map
       .on('locationfound', this._locationFound, this)
       .on('locationerror', this._locationError, this)
-      .locate(L.extend({ watch: true }, this._control.options.track))
+      .locate(L.extend({ watch: true }, this.options.locate))
       .fire('traceroute:track:start', this);
     this.trace.addTo(map);
   },
