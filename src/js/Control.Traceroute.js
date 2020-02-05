@@ -68,26 +68,8 @@ L.Control.Traceroute = L.Control.extend({
     },
   },
   initialize: function (options) {
-    // TODO: fix options merging for icons and other
-    for (let [key, value] of Object.entries(this.options)) {
-      if (options.hasOwnProperty(key)) {
-        L.extend(options[key], value);
-      }
-    }
-    L.Util.setOptions(this, options);
+    L.Control.Traceroute.mergeDeep(this.options, options);
 
-    // FIXME Make a deep merge of the options
-    // function mergeOptions(defaultOptions, options) {
-    //   for (const key in defaultOptions) {
-    //     if (Object.prototype.toString.call(options[key]) === '[object Object]') {
-    //       mergeOptions.call(defaultOptions[key], options[key]);
-    //     } else if (typeof options[key] !== 'undefined') {
-    //       defaultOptions[key] = options[key]
-    //     }
-    //   }
-    // };
-    //
-    // mergeOptions(this.options, options);
     this.handler = new L.Handler.Traceroute(this);
 
     for (let tool of Object.values(this.options.tools)) {
@@ -142,7 +124,7 @@ L.Control.Traceroute = L.Control.extend({
     }
   },
   statics: {
-    format(number, unit) {
+    format: function(number, unit) {
       const one_NM = 1852;
       const one_mi = 1609.344;
       const one_ft = 0.3048;
@@ -181,7 +163,7 @@ L.Control.Traceroute = L.Control.extend({
           return `${(number).toFixed(0)}${unit}`
         }
       },
-    extractData(layer, dataset) {
+    extractData: function(layer, dataset) {
       switch (dataset) {
         case 'waypoint':
           return {
@@ -211,6 +193,24 @@ L.Control.Traceroute = L.Control.extend({
             time: this.format(layer.position.timestamp, 'time'),
           }
       }
+    },
+    mergeDeep: function thisDeep(target, ...sources) {
+      const isObject = item => (item && typeof item === 'object' && !Array.isArray(item));
+
+      if (!sources.length) return target;
+      const source = sources.shift();
+
+      if (isObject(target) && isObject(source)) {
+        for (const key in source) {
+          if (isObject(source[key])) {
+            if (!target[key]) Object.assign(target, { [key]: {} });
+            thisDeep(target[key], source[key]);
+          } else {
+            Object.assign(target, { [key]: source[key] });
+          }
+        }
+      }
+     thisDeep(target, ...sources);
     }
   }
 })

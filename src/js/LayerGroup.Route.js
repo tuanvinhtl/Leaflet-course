@@ -13,14 +13,8 @@ L.LayerGroup.Route = L.LayerGroup.extend({
     waypoint: {bubblingMouseEvents: false},
     midpoint: {bubblingMouseEvents: false},
   },
-  initialize: function(layer, options) {
-    for (let [key, value] of Object.entries(this.options)) {
-      if (options.hasOwnProperty(key)) {
-        L.extend(options[key], value);
-      }
-    }
-    // FIXME: fix deepmerge issue
-    L.Util.setOptions(this, options);
+  initialize: function (layer, options) {
+    L.Control.Traceroute.mergeDeep(this.options, options);
 
     this._layers = {};
     this.editHandler = new L.Handler.RouteEdit(this);
