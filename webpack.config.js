@@ -35,12 +35,12 @@ module.exports = {
   },
   devServer: {
     contentBase: [__dirname, path.join(__dirname, 'dist')],
-    contentBase: './',
+    contentBase: 'dist/',
     watchContentBase: true,
     https: true,
     open: true,
-    openPage: ['demo.html']
-    // openPage: ['webpack-dev-server/demo.html']
+    // openPage: ['demo.html'],
+    openPage: ['webpack-dev-server/test.html'],
     // bonjour: true
   }
 };

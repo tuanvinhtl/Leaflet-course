@@ -14,7 +14,7 @@
 * Should work on **touchscreen** too.
 
 ## Demo
-* Please take a look at the [**Demo**](https://elmatou.github.io/Leaflet-control-traceroute/trace.html)
+* Please take a look at the [**Demo**](https://elmatou.github.io/Leaflet-control-traceroute/dist/demo.html)
 
 ## Usage
 
@@ -98,7 +98,7 @@ map.on('traceroute:waypoint:add', e => { /* <Marker.Waypoint> */});
 map.on('traceroute:waypoint:move', e => { /* <Marker.Waypoint> */});
 map.on('traceroute:waypoint:remove', e => { /*<Marker.Waypoint> */});
 ```
-Please take a look at the [**Demo**](https://elmatou.github.io/Leaflet-control-traceroute/trace.html) each event is printed in the console.
+Please take a look at the [**Demo**](https://elmatou.github.io/Leaflet-control-traceroute/dist/demo.html) each event is printed in the console.
 
 ## Helpers
 the library come with some handy function to help you.
