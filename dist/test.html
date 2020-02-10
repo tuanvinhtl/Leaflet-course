@@ -42,15 +42,25 @@
   // .addLayer(layerAIP)
   .setView (new L.LatLng(43.215398,0.078266), 14);
 
+  function wrapit(p){ 
+    return {
+      prev_id: p.previous? p.previous._leaflet_id : null, 
+      id: p._leaflet_id,
+      next_id: p.next? p.next._leaflet_id : null,
+    }
+  }
+
   var traceroute = L.control.traceroute({
     position: 'bottomleft',
     tools: {
       route: {
-        icon: '⥉', 
+        // trace: { weight: 5, opacity: 1, color: 'pink' },
+        // pointer: { dashArray: '8', color: 'green' },
+        // icon: '⥉', 
         waypoint: {
-          tooltip: p => {
-            return L.Util.template("<strong>id :</strong> {_leaflet_id}<br /><strong>prev :</strong> {previous}<br /><strong>next :</strong> +{next}", p)
-          }
+          // tooltip: p => `<pre id='json'>${JSON.stringify(wrapit(p), null, 2)}</pre>`,
+          tooltip: p => `<pre id='json'>${JSON.stringify(L.Control.Traceroute.extractData(p.export()), null, 2)}</pre>`,
+          // popup: null,
         }
       }
     }

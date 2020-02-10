@@ -19,10 +19,10 @@ L.Control.Traceroute = L.Control.extend({
         waypoint: {
           icon: L.divIcon({ className: 'leaflet-control-traceroute-icon', html: "<span class='leaflet-control-traceroute-point'></span>", iconAnchor: [20, 18], iconSize:[40, 40]}),
           popup: p => {
-            return L.Util.template("<strong>in :</strong> {in}<br /><strong>out :</strong> {out}<br /><strong>distance :</strong> +{distance}<br /><strong>Total distance :</strong> {totalDistance}", L.Control.Traceroute.extractData(p, 'waypoint'))
+            return L.Util.template("<strong>in :</strong> {in}<br /><strong>out :</strong> {out}<br /><strong>distance :</strong> +{distance}<br /><strong>Total distance :</strong> {totalDistance}", L.Control.Traceroute.extractData(p.data))
           },
           tooltip: p => {
-            return L.Util.template("<strong>in :</strong> {in}<br /><strong>out :</strong> {out}<br /><strong>distance :</strong> +{distance}", L.Control.Traceroute.extractData(p, 'waypoint'))
+            return L.Util.template("<strong>in :</strong> {in}<br /><strong>out :</strong> {out}<br /><strong>distance :</strong> +{distance}", L.Control.Traceroute.extractData(p.data))
           },
         },
         midpoint: {
@@ -40,7 +40,7 @@ L.Control.Traceroute = L.Control.extend({
         marker: {
           icon: L.divIcon({ className: 'leaflet-control-traceroute-icon', html: "<span class='leaflet-control-traceroute-losange'></span>", iconAnchor: [20, 18], iconSize:[40, 40]}),
           tooltip: p => {
-            return L.Util.template("<strong>QDR :</strong> {qdr}<br /><strong>QDM :</strong> {qdm}<br /><strong>distance :</strong> +{distance}", L.Control.Traceroute.extractData(p, 'bearing'))
+            return L.Util.template("<strong>QDR :</strong> {qdr}<br /><strong>QDM :</strong> {qdm}<br /><strong>distance :</strong> +{distance}", L.Control.Traceroute.extractData(p.data))
           },
         },
         trace: { dashArray: '5,5,1,5', opacity: 0.3, color: 'grey', },
@@ -53,7 +53,7 @@ L.Control.Traceroute = L.Control.extend({
         marker: {
           icon: L.divIcon({ className: 'leaflet-control-traceroute-icon', html: "<div class='leaflet-control-traceroute-airplane'></div>", iconAnchor: [20, 18], iconSize:[40, 40]}),
           tooltip: p => {
-            return L.Util.template("<strong>accuracy :</strong> {accuracy}<br /><strong>altitude (+/-{altitudeAccuracy}):</strong> {altitude} ({vario}) <br /><strong>heading :</strong> {heading} ({bearing})<br /><strong>speed :</strong> {speed} ({estimatedSpeed})<br />last seen at <strong>{time}</strong>", L.Control.Traceroute.extractData(p, 'position'))
+            return L.Util.template("<strong>accuracy :</strong> {accuracy}<br /><strong>altitude (+/-{altitudeAccuracy}):</strong> {altitude} ({vario}) <br /><strong>heading :</strong> {heading} ({bearing})<br /><strong>speed :</strong> {speed} ({estimatedSpeed})<br />last seen at <strong>{time}</strong>", L.Control.Traceroute.extractData(p.data))
           },
         },
         circle: {},
@@ -163,36 +163,23 @@ L.Control.Traceroute = L.Control.extend({
           return `${(number).toFixed(0)}${unit}`
         }
       },
-    extractData: function(layer, dataset) {
-      switch (dataset) {
-        case 'waypoint':
-          return {
-            out: this.format(layer.route.out, '°'),
-            in: this.format(layer.route.in, '°'),
-            distance: this.format(layer.route.distance, 'NM'),
-            totalDistance: this.format(layer.route.totalDistance, 'NM'),
-          }
-        case 'bearing':
-          return {
-            qdr: this.format(layer.bearing.qdr, '°'),
-            qdm: this.format(layer.bearing.qdm, '°'),
-            distance: this.format(layer.bearing.distance, 'NM'),
-          }
-        case 'position':
-          return {
-            latitude: this.format(layer.position.latitude, '°'),
-            longitude: this.format(layer.position.longitude, '°'),
-            altitude: this.format(layer.position.altitude, 'ft'),
-            vario: this.format(layer.position.vario, 'ft/min'),
-            accuracy: this.format(layer.position.accuracy, 'm'),
-            altitudeAccuracy: this.format(layer.position.altitudeAccuracy, 'm'),
-            heading: this.format(layer.position.heading, '°'),
-            bearing: this.format(layer.position.bearing, '°'),
-            speed: this.format(layer.position.speed, 'kt'),
-            estimatedSpeed: this.format(layer.position.estimatedSpeed, 'kt'),
-            time: this.format(layer.position.timestamp, 'time'),
-          }
+    extractData: function(data) {
+      const units = {
+        latitude: '°', longitude: '°',
+        out: '°', in: '°', distance: 'NM', totalDistance: 'NM',
+        qdr: '°', qdm: '°', distance: 'NM',
+        altitude: 'ft', vario: 'ft/min',
+        accuracy: 'm', altitudeAccuracy: 'm',
+        heading: '°', bearing: '°',
+        speed: 'kt', estimatedSpeed: 'kt',
+        time: 'time',
       }
+      let result = {};
+      for (let [quantity, value] of Object.entries(data)) {
+        if (typeof units[quantity] != 'undefined')
+         result[quantity] = this.format(value, units[quantity]);
+      }
+      return result;
     },
     mergeDeep: function thisDeep(target, ...sources) {
       const isObject = item => (item && typeof item === 'object' && !Array.isArray(item));

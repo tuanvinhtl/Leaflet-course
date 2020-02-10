@@ -1,3 +1,6 @@
+import './Marker.Trackpoint'
+
+
 L.Handler.TrackBase = L.Handler.extend({
   initialize: function (control, options) {
     L.Util.setOptions(this, options);
@@ -53,7 +56,6 @@ L.Handler.TrackBase = L.Handler.extend({
     this.trace
       .addTo(map)
       .addLatLng(e.latlng)
-
     map
       .fire('traceroute:track:found', e)
   },

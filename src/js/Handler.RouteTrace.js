@@ -11,14 +11,12 @@ L.Handler.RouteTrace = L.Handler.extend({
     this._clearPointerTrace();
     this._pointerTrace.addTo(map);
     map
-      .on('mousemove', this._drawPointerTrace, this)
+      .on('mousemove', this._drawPointer, this)
       .on('click', this._createPoint, this);
     L.DomEvent
       .on(document, 'keydown', this._onKeyDown, this);
 
-    if (!this._route) {
-      this._createRoute();
-    }
+    if (!this._route) this._createRoute();
 
     this._route.waypoints
       .on('click', this._finishRouteIfLast, this);
@@ -29,7 +27,7 @@ L.Handler.RouteTrace = L.Handler.extend({
     this._pointerTrace.removeFrom(map);
 
     map
-      .off('mousemove', this._drawPointerTrace, this)
+      .off('mousemove', this._drawPointer, this)
       .off('click', this._createPoint, this);
     L.DomEvent
       .off(document, 'keydown', this._onKeyDown, this);
@@ -46,13 +44,11 @@ L.Handler.RouteTrace = L.Handler.extend({
       .addTo(this._routes);
   },
   _createPoint: function(e) {
-    if (!this._route) {
-      this._createRoute();
-    }
+    if (!this._route) this._createRoute();
     return this._route.createWaypoint(e);
   },
   _finishRouteIfLast: function(e) {
-    if (e.layer === this._route.waypoints.last()) {
+    if (e.layer === e.layer.tolast()) {
       this._finishRoute();
     }
   },
@@ -67,9 +63,9 @@ L.Handler.RouteTrace = L.Handler.extend({
     this.disable();
     return this._route;
   },
-  _drawPointerTrace: function(e) {
-    if(this._route && this._route.waypoints.last()) {
-      this._pointerTrace.setLatLngs([this._route.waypoints.last().getLatLng(), e.latlng]);
+  _drawPointer: function(e) {
+    if(this._route && this._route.waypoints.getLayers().length > 0) {
+      this._pointerTrace.setLatLngs([this._route.waypoints.getLayers()[0].tolast().getLatLng(), e.latlng]);
     }
   },
   _clearPointerTrace: function() {

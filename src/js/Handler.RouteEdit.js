@@ -28,6 +28,6 @@ L.Handler.RouteEdit = L.Handler.extend({
       .eachLayer(layer => layer.dragging.disable());
   },
   _removeLayer: function(e) {
-    this.removeLayer(e.layer)
+    this.removeLayer(e.layer);
   },
 });

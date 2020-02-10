@@ -29,6 +29,9 @@ L.Handler.BearingBase = L.Handler.extend({
 
     L.DomEvent
       .on(document, 'keydown', this._onKeyDown, this);
+
+    map
+      .fire('traceroute:bearing:start', this._control);
   },
   removeHooks: function() {
     L.DomEvent
@@ -47,6 +50,9 @@ L.Handler.BearingBase = L.Handler.extend({
     this.target.style.filter = 'invert(0)';
 
     this.traceHandler.disable();
+
+    map
+    .fire('traceroute:bearing:stop', this._control);
   },
   _selectOrigin: function(e) {
     this.traceHandler.origin = e.layer;

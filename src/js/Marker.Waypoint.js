@@ -1,111 +1,68 @@
-import 'leaflet-rotatedmarker'
-
-L.Marker.Traceroute = L.Marker.extend({
-  options: {
-    autoPan: true
-  },
-  bearingTo: function(latlng) {
-    // https://github.com/makinacorpus/Leaflet.GeometryUtil
-    let rad = Math.PI / 180,
-        lat1 = this._latlng.lat * rad,
-        lat2 = latlng.lat * rad,
-        lon1 = this._latlng.lng * rad,
-        lon2 = latlng.lng * rad,
-        y = Math.sin(lon2 - lon1) * Math.cos(lat2),
-        x = Math.cos(lat1) * Math.sin(lat2) -
-            Math.sin(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1);
-    return ((Math.atan2(y, x) * 180 / Math.PI) + 360) % 360;
-  },
-  distanceTo: function (latlng) {
-    return map.distance(this._latlng, latlng);
-  },
-});
+import './Marker.Traceroute';
+import 'leaflet-rotatedmarker';
+import 'leaflet.geodesic';
 
 L.Marker.Waypoint = L.Marker.Traceroute.extend({
-  route: { in: 0, out: 0, distance: 0, totalDistance: 0 },
-  bearings: [],
+  geodesic: L.geodesic().geom.geodesic,
+  export: function () {
+    if (typeof this.fellow.bearings != 'undefined') this.data.bearings = this.fellow.bearings.map(b => b.export());
+    // if (this.previous instanceof L.Marker.Waypoint) Object.assign(this.data, { previous: this.previous.export() });
+    // if (this.next instanceof L.Marker.Waypoint) Object.assign(this.data, { next: this.next.export() });
+
+    return this.data
+  },
   addBearing: function(bearing) {
-    this.bearings.push(bearing)
+    if (typeof this.fellow.bearings == 'undefined') this.fellow.bearings = [];
+    this.fellow.bearings.push(bearing)
     bearing.origin = this;
     return this;
   },
-  // TODO: decorate should be here, need next prev method on ordered layer
-  // _decorate: function(prev, next) {
-  //
-  //   this.route.position = this._latlng
-  //   this.route.in = geodesic.inverse(prev.getLatLng(), this.getLatLng());
-  //   this.route.out = geodesic.inverse(this.getLatLng(), next.getLatLng());
-  //   this.togglePopup().togglePopup().toggleTooltip().toggleTooltip();
-  //
-  //   this.route.position = this._latlng
-  //   this.route.out = geodesic.inverse(this.getLatLng(), next.getLatLng());
-  //   next.route.in
-  // },
-});
+  setSiblings: function(previous, next) { 
+    if (previous instanceof L.Marker.Waypoint) { // set if arg is a Waypoint or null
+      this.previous = previous;
+      previous.next = this;
+    } else if (previous == null) this.previous = null;
 
-L.Marker.Bearing = L.Marker.Traceroute.extend({
-  initialize: function(latlng, options) {
-    this.trace = new L.Polyline([], options.trace);
-    delete options.trace;
-
+    if (next instanceof L.Marker.Waypoint) { // set if arg is a Waypoint or null
+      this.next = next;
+      next.previous = this;
+    } else if (next == null) this.next = null;
+    
     this
-      .on('move', this._decorate, this)
-      .on('move', this._draw, this)
-
-    Object.getPrototypeOf(Object.getPrototypeOf(this)).initialize.call(this, latlng, options);
-  },
-  onAdd: function(map) {
-    this.trace.addTo(map);
-    Object.getPrototypeOf(Object.getPrototypeOf(this)).onAdd.call(this, map);
-  },
-  onRemove: function(map) {
-    this.trace.remove();
-    Object.getPrototypeOf(Object.getPrototypeOf(this)).onRemove.call(this, map);
-  },
-  bearing: {},
-  setOrigin: function(origin) {
-    this.origin = origin;
-    origin
-      .on('remove', this.remove, this)
-      .on('move remove', this._decorate, this)
-      .on('move remove', this._draw, this)
-      .bearings.push(this);
-    this
-      ._decorate()
-      ._draw();
+      .fire('update', this, true);
     return this;
   },
-  // TODO: assert if removeOrgin() could be useful.
   _decorate: function() {
-    if (this.origin instanceof L.Marker.Waypoint) {
-      this.bearing.qdr = Number(this.bearingTo(this.origin.getLatLng()).toPrecision(5));
-      this.bearing.qdm = Number(this.origin.bearingTo(this._latlng).toPrecision(5));
-      this.bearing.distance = Number(this.distanceTo(this.origin.getLatLng()).toPrecision(5));
-    }
-    this.toggleTooltip().toggleTooltip();
-    return this
-  },
-  _draw: function() {
-    this.trace.setLatLngs([this._latlng, this.origin.getLatLng()])
-    return this
-  },
-});
+    this.data.position = this._latlng;
+    
+    if(this.previous instanceof L.Marker.Waypoint) {
+      let leg = this.geodesic.inverse(this.previous.getLatLng(), this.getLatLng());
 
-L.Marker.Trackpoint = L.Marker.Traceroute.extend({
-  decorate: function(e) {
-    this
-      ._extractLocation(e)
-      .setRotationAngle(e.heading || 0)
-      .toggleTooltip().toggleTooltip();
+      this.data.in = Number(leg.finalBearing.toPrecision(5));
+      this.data.distance = Number(leg.distance.toPrecision(5));
+      this.data.totalDistance = (this.previous.data.totalDistance || 0) + this.data.distance;
+    }
+    if(this.next instanceof L.Marker.Waypoint) {
+      let leg = this.geodesic.inverse(this.getLatLng(), this.next.getLatLng());
+      this.data.out = Number(leg.initialBearing.toPrecision(5));
+    }
+
+    this.togglePopup().togglePopup().toggleTooltip().toggleTooltip();
+    return this;
   },
-  // setHeading: function(latlng) {
-  //   if (typeof this.position.heading == 'undefined') {
-  //     this.position.heading = (this.bearingTo(latlng) -180) % 360;
-  //   }
-  //   this.setRotationAngle(this.position.heading)
-  // },
-  _extractLocation: function(e) {
-    this.position = (({ latitude, longitude, altitude, vario, accuracy, altitudeAccuracy, heading, bearing, estimatedSpeed, speed, timestamp }) => ({ latitude, longitude, altitude, vario, accuracy, altitudeAccuracy, heading, bearing, estimatedSpeed, speed, timestamp }))(e)
-    return this
+  tofirst: function(fcn) {
+    return this._follow(fcn, mkr => mkr.previous );
+  },
+  tolast: function(fcn) {
+    return this._follow(fcn, mkr => mkr.next );
+  },
+  _follow: function(fcn, step) {
+    let mkr, nxt = this;
+    while(nxt instanceof L.Marker.Waypoint) {
+      mkr = nxt;
+      if (typeof fcn == "function") fcn.call(this, mkr);
+      nxt = step(mkr);
+    }
+    return mkr
   }
 });

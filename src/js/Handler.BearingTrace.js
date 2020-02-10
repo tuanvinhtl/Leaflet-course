@@ -1,3 +1,5 @@
+import './Marker.Bearing'
+
 L.Handler.BearingTrace = L.Handler.extend({
   initialize: function (bearings, options) {
     L.Util.setOptions(this, options);
