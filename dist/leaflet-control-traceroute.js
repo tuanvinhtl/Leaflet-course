@@ -633,12 +633,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Handler_RouteBase__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Handler.RouteBase */ "./js/Handler.RouteBase.js");
 /* harmony import */ var _Handler_BearingBase__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Handler.BearingBase */ "./js/Handler.BearingBase.js");
 /* harmony import */ var _Handler_TrackBase__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Handler.TrackBase */ "./js/Handler.TrackBase.js");
-/* harmony import */ var _Handler_TrackBase__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_Handler_TrackBase__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var leaflet_geodesic__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! leaflet.geodesic */ "../node_modules/leaflet.geodesic/dist/leaflet.geodesic.umd.min.js");
-/* harmony import */ var leaflet_geodesic__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(leaflet_geodesic__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var _css_trace_css__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../css/trace.css */ "./css/trace.css");
-/* harmony import */ var _css_trace_css__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_css_trace_css__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var _Handler_ClearBase__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Handler.ClearBase */ "./js/Handler.ClearBase.js");
+/* harmony import */ var _Handler_ClearBase__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_Handler_ClearBase__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var leaflet_geodesic__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! leaflet.geodesic */ "../node_modules/leaflet.geodesic/dist/leaflet.geodesic.umd.min.js");
+/* harmony import */ var leaflet_geodesic__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(leaflet_geodesic__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var _css_trace_css__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../css/trace.css */ "./css/trace.css");
+/* harmony import */ var _css_trace_css__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(_css_trace_css__WEBPACK_IMPORTED_MODULE_7__);
 // import L from 'leaflet';
+
 
 
 
@@ -650,49 +652,61 @@ __webpack_require__.r(__webpack_exports__);
 
 L.Control.Traceroute = L.Control.extend({
   options: {
-    control: {
-      trace: ['☡', 'Start a route'], // ⥉
-      clear: ['✗', 'Clear routes'], // ⥇
-      bearing: ['∡', 'Radio Navigation'], // 🧭∢∠
-      track: ['✈', 'Track Position'], // ✇
-    },
-    pointerTrace: {dashArray: '8'},
-    waypoint: {
-      icon: L.divIcon({ className: 'leaflet-control-traceroute-icon', html: "<span class='leaflet-control-traceroute-point'></span>", iconAnchor: [20, 18], iconSize:[40, 40]}),
-      popup: p => {
-        return L.Util.template("<strong>in :</strong> {in}<br /><strong>out :</strong> {out}<br /><strong>distance :</strong> +{distance}<br /><strong>Total distance :</strong> {totalDistance}", L.Control.Traceroute.extractData(p, 'waypoint'))
+    tools: {
+      route: {
+        icon: '☡',// ⥉
+        title: 'Start a route',
+        handler: L.Handler.RouteBase,
+        waypoint: {
+          icon: L.divIcon({ className: 'leaflet-control-traceroute-icon', html: "<span class='leaflet-control-traceroute-point'></span>", iconAnchor: [20, 18], iconSize:[40, 40]}),
+          popup: p => {
+            return L.Util.template("<strong>in :</strong> {in}<br /><strong>out :</strong> {out}<br /><strong>distance :</strong> +{distance}<br /><strong>Total distance :</strong> {totalDistance}", L.Control.Traceroute.extractData(p, 'waypoint'))
+          },
+          tooltip: p => {
+            return L.Util.template("<strong>in :</strong> {in}<br /><strong>out :</strong> {out}<br /><strong>distance :</strong> +{distance}", L.Control.Traceroute.extractData(p, 'waypoint'))
+          },
+        },
+        midpoint: {
+          icon: L.divIcon({ className: 'leaflet-control-traceroute-icon', html: "<div class='leaflet-control-traceroute-arrow'></div>", iconAnchor: [20, 18], iconSize:[40, 40]}),
+          tooltip: 'Click to insert a waypoints here',
+          opacity: 0.5
+        },
+        trace: { weight: 5, opacity: 0.5, color: 'black' },
+        pointer: { dashArray: '8' },
       },
-      tooltip: p => {
-        return L.Util.template("<strong>in :</strong> {in}<br /><strong>out :</strong> {out}<br /><strong>distance :</strong> +{distance}", L.Control.Traceroute.extractData(p, 'waypoint'))
+      bearing: {
+        icon: '∡',// 🧭∢∠
+        title: 'Radio Navigation',
+        handler: L.Handler.BearingBase,
+        marker: {
+          icon: L.divIcon({ className: 'leaflet-control-traceroute-icon', html: "<span class='leaflet-control-traceroute-losange'></span>", iconAnchor: [20, 18], iconSize:[40, 40]}),
+          tooltip: p => {
+            return L.Util.template("<strong>QDR :</strong> {qdr}<br /><strong>QDM :</strong> {qdm}<br /><strong>distance :</strong> +{distance}", L.Control.Traceroute.extractData(p, 'bearing'))
+          },
+        },
+        trace: { dashArray: '5,5,1,5', opacity: 0.3, color: 'grey', },
+        pointer: { dashArray: '8' }
       },
-    },
-    midpoint: {
-      icon: L.divIcon({ className: 'leaflet-control-traceroute-icon', html: "<div class='leaflet-control-traceroute-arrow'></div>", iconAnchor: [20, 18], iconSize:[40, 40]}),
-      tooltip: 'Click to insert a waypoints here',
-    },
-    trace: {
-      weight: 5,
-      opacity: 0.5,
-      color: 'black',
-    },
-    bearingpoint: {
-      icon: L.divIcon({ className: 'leaflet-control-traceroute-icon', html: "<span class='leaflet-control-traceroute-losange'></span>", iconAnchor: [20, 18], iconSize:[40, 40]}),
-      tooltip: p => {
-        return L.Util.template("<strong>QDR :</strong> {qdr}<br /><strong>QDM :</strong> {qdm}<br /><strong>distance :</strong> +{distance}", L.Control.Traceroute.extractData(p, 'bearing'))
+      track: {
+        icon: '✈',// ✇
+        title: 'Track Position',
+        handler: L.Handler.TrackBase,
+        marker: {
+          icon: L.divIcon({ className: 'leaflet-control-traceroute-icon', html: "<div class='leaflet-control-traceroute-airplane'></div>", iconAnchor: [20, 18], iconSize:[40, 40]}),
+          tooltip: p => {
+            return L.Util.template("<strong>accuracy :</strong> {accuracy}<br /><strong>altitude (+/-{altitudeAccuracy}):</strong> {altitude} ({vario}) <br /><strong>heading :</strong> {heading} ({bearing})<br /><strong>speed :</strong> {speed} ({estimatedSpeed})<br />last seen at <strong>{time}</strong>", L.Control.Traceroute.extractData(p, 'position'))
+          },
+        },
+        circle: {},
+        trace: { weight: 5, opacity: 0.5, color: 'black' },
+        locate: { enableHighAccuracy: true, timeout: 5000, maximumAge: 0, setView: true }
       },
+      clear: {
+          icon: '✗',// ⥇
+          title: 'Clear routes',
+          handler: L.Handler.ClearBase
+        },
     },
-    bearings: {
-      dashArray: '5,5,1,5',
-      opacity: 0.3,
-      color: 'grey',
-    },
-    trackpoint: {
-      icon: L.divIcon({ className: 'leaflet-control-traceroute-icon', html: "<div class='leaflet-control-traceroute-airplane'></div>", iconAnchor: [20, 18], iconSize:[40, 40]}),
-      tooltip: p => {
-        return L.Util.template("<strong>accuracy :</strong> {accuracy}<br /><strong>altitude :</strong> {altitude}<br /><strong>heading :</strong> {heading}<br /><strong>bearing :</strong> {bearing}<br /><strong>speed :</strong> {speed}<br />last seen at <strong>{time}</strong>", L.Control.Traceroute.extractData(p, 'position'))
-      },
-    },
-    track: { enableHighAccuracy: true, timeout: 5000, maximumAge: 1 }
   },
   initialize: function (options) {
     // TODO: fix options merging for icons and other
@@ -703,12 +717,24 @@ L.Control.Traceroute = L.Control.extend({
     }
     L.Util.setOptions(this, options);
 
-    this.handlers = {
-      base: new L.Handler.Traceroute(this),
-      route: new L.Handler.RouteBase(this),
-      bearing:new L.Handler.BearingBase(this),
-      track:new L.Handler.TrackBase(this)
-    };
+    // FIXME Make a deep merge of the options
+    // function mergeOptions(defaultOptions, options) {
+    //   for (const key in defaultOptions) {
+    //     if (Object.prototype.toString.call(options[key]) === '[object Object]') {
+    //       mergeOptions.call(defaultOptions[key], options[key]);
+    //     } else if (typeof options[key] !== 'undefined') {
+    //       defaultOptions[key] = options[key]
+    //     }
+    //   }
+    // };
+    //
+    // mergeOptions(this.options, options);
+    this.handler = new L.Handler.Traceroute(this);
+
+    for (let tool of Object.values(this.options.tools)) {
+      tool.handler = new tool.handler(this, tool);
+    }
+
   },
   onAdd: function(map) {
     this._map = map;
@@ -718,24 +744,9 @@ L.Control.Traceroute = L.Control.extend({
     linksContainer.classList.add('leaflet-bar');
     L.DomEvent.disableClickPropagation(linksContainer);
 
-    if(this.options.control.trace) {
+    for (const tool of Object.values(this.options.tools)) {
       linksContainer.appendChild(
-        this._createControl(...this.options.control.trace, this._toggleMode(this.handlers.route))
-      );
-    }
-    if(this.options.control.bearing) {
-      linksContainer.appendChild(
-        this._createControl(...this.options.control.bearing, this._toggleMode(this.handlers.bearing))
-      );
-    }
-    if(this.options.control.track) {
-      linksContainer.appendChild(
-        this._createControl(...this.options.control.track, this._toggleMode(this.handlers.track))
-      );
-    }
-    if(this.options.control.clear) {
-      linksContainer.appendChild(
-        this._createControl(...this.options.control.clear, this.clear)
+        this._createControl(tool.icon, tool.title, this._toggleMode(tool.handler))
       );
     }
 
@@ -758,13 +769,6 @@ L.Control.Traceroute = L.Control.extend({
     return control;
   },
   _routes: L.layerGroup(),
-  clear: function() {
-    this.handlers.route.disable();
-    this.handlers.bearing.disable();
-    this._routes.clearLayers();
-    this._map.fire('traceroute:clear');
-    return false;
-  },
   _toggleMode: function(handler) {
     return function (e) {
       if (e && e.target) {
@@ -778,13 +782,14 @@ L.Control.Traceroute = L.Control.extend({
       return handler.enabled();
     }
   },
-  // import: (waypoints) => {},
-  // export: (route) => {},
   statics: {
     format(number, unit) {
       const one_NM = 1852;
       const one_mi = 1609.344;
       const one_ft = 0.3048;
+      const one_min = 60;
+      const one_hour = 3600;
+      const one_kilo = 1000;
 
       if (typeof number !== 'number') {
         return `- ${unit}`
@@ -793,21 +798,23 @@ L.Control.Traceroute = L.Control.extend({
       }
 
       switch (unit) {
-        case 'km':
-          return `${(number/1000).toFixed(1)}${unit}`
-        case 'mi':
+        case 'km': // from m
+          return `${(number/one_kilo).toFixed(1)}${unit}`
+        case 'mi': // from m
           return `${(number/one_mi).toFixed(1)}${unit}`
-        case 'NM':
+        case 'NM': // from m
           return `${(number/one_NM).toFixed(1)}${unit}`
-        case 'km/h':
-          return `${(number/1000*60*60).toFixed(0)}${unit}`
-        case 'kt':
-          return `${(number/one_NM*60*60).toFixed(0)}${unit}`
-        case 'ft':
+        case 'km/h': //from m/s
+          return `${(number/one_kilo*one_hour).toFixed(0)}${unit}`
+        case 'ft/min': // from m/s
+          return `${(number/one_ft*one_min).toFixed(0)}${unit}`
+        case 'kt': // from m/s
+          return `${(number/one_NM*one_hour).toFixed(0)}${unit}`
+        case 'ft': // from m
           return `${(number/one_ft).toFixed(0)}${unit}`
         case '°':
           return `${number.toFixed(1)}${unit}`
-        case 'time':
+        case 'time': // from timestamp
           return new Date(number).toUTCString().slice(-12)
         default:
         unit = 'm'
@@ -835,20 +842,17 @@ L.Control.Traceroute = L.Control.extend({
             latitude: this.format(layer.position.latitude, '°'),
             longitude: this.format(layer.position.longitude, '°'),
             altitude: this.format(layer.position.altitude, 'ft'),
+            vario: this.format(layer.position.vario, 'ft/min'),
             accuracy: this.format(layer.position.accuracy, 'm'),
             altitudeAccuracy: this.format(layer.position.altitudeAccuracy, 'm'),
             heading: this.format(layer.position.heading, '°'),
             bearing: this.format(layer.position.bearing, '°'),
             speed: this.format(layer.position.speed, 'kt'),
+            estimatedSpeed: this.format(layer.position.estimatedSpeed, 'kt'),
             time: this.format(layer.position.timestamp, 'time'),
           }
       }
-    },
-    // export(route) {
-    //   route.waypoints.getLayers().forEach(m => {
-    //     console.debug(m.toGeoJSON());
-    //   });
-    // },
+    }
   }
 })
 
@@ -965,23 +969,34 @@ L.FeatureGroup.Ordered = L.LayerGroup.Ordered.extend({
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* WEBPACK VAR INJECTION */(function(L) {/* harmony import */ var _Handler_BearingTrace__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Handler.BearingTrace */ "./js/Handler.BearingTrace.js");
-/* harmony import */ var _Handler_BearingTrace__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_Handler_BearingTrace__WEBPACK_IMPORTED_MODULE_0__);
 
 
 L.Handler.BearingBase = L.Handler.extend({
-  initialize: function (control) {
+  initialize: function (control, options) {
+    L.Util.setOptions(this, options);
     this._control = control;
-    this.traceHandler = new L.Handler.BearingTrace(control);
+
+    this.bearings = new L.FeatureGroup()
+      .addTo(map);
+
+    this.traces = new L.Polyline([], this.options.trace)
+      .addTo(map);
+
+    this.traceHandler = new L.Handler.BearingTrace(this.bearings, this.options);
   },
   addHooks: function() {
-    this._control.handlers.route.disable();
-    this._control.handlers.base.enable();
+    this._control.options.tools.route.handler.disable();
+    this._control.handler.enable();
     this.target.style.filter = 'invert(1)';
 
     this._control._routes.eachLayer(function(route) {
       route.waypoints.on('click', this._selectOrigin, this)
-      route.bearingpoints.eachLayer(layer => layer.dragging.enable());
     }, this);
+
+    this.bearings
+      .bindTooltip(this.options.marker.tooltip, { direction: 'auto' })
+      .unbindPopup()
+      .eachLayer(marker => marker.dragging.enable());
 
     L.DomEvent
       .on(document, 'keydown', this._onKeyDown, this);
@@ -990,12 +1005,16 @@ L.Handler.BearingBase = L.Handler.extend({
     L.DomEvent
       .off(document, 'keydown', this._onKeyDown, this);
 
+      this.bearings
+        .bindPopup(this.options.marker.tooltip, { direction: 'auto' })
+        .unbindTooltip()
+        .eachLayer(marker => marker.dragging.disable());
+
     this._control._routes.eachLayer(function(route) {
       route.waypoints.off('click', this._selectOrigin, this)
-      route.bearingpoints.eachLayer(layer => layer.dragging.disable());
     }, this);
 
-    this._control.handlers.base.disable();
+    this._control.handler.disable();
     this.target.style.filter = 'invert(0)';
 
     this.traceHandler.disable();
@@ -1022,21 +1041,30 @@ L.Handler.BearingBase = L.Handler.extend({
 /*!************************************!*\
   !*** ./js/Handler.BearingTrace.js ***!
   \************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(L) {L.Handler.BearingTrace = L.Handler.extend({
-  initialize: function (control) {
-    this._control = control;
-    this._pointerTrace = new L.Polyline([], this._control.options.pointerTrace);
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* WEBPACK VAR INJECTION */(function(L) {/* harmony import */ var _Marker_Bearing__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Marker.Bearing */ "./js/Marker.Bearing.js");
+
+
+L.Handler.BearingTrace = L.Handler.extend({
+  initialize: function (bearings, options) {
+    L.Util.setOptions(this, options);
+
+    this.bearings = bearings;
+    this._pointer = new L.Polyline([], options.pointer);
   },
   addHooks: function() {
-    this._clearPointerTrace();
-    this._pointerTrace.addTo(map);
+    this._clearPointer();
+    this._pointer
+      .addTo(map);
 
     map
-      .on('mousemove', this._drawPointerTrace, this)
+      .on('mousemove', this._drawPointer, this)
       .on('click', this._setBearing, this);
+
     L.DomEvent
       .on(document, 'keydown', this._onKeyDown, this);
 
@@ -1045,11 +1073,12 @@ L.Handler.BearingBase = L.Handler.extend({
     }
   },
   removeHooks: function() {
-    this._clearPointerTrace();
-    this._pointerTrace.removeFrom(map);
+    this._clearPointer();
+    this._pointer
+      .removeFrom(map);
 
     map
-      .off('mousemove', this._drawPointerTrace, this)
+      .off('mousemove', this._drawPointer, this)
       .off('click', this._setBearing, this);
 
     L.DomEvent
@@ -1058,24 +1087,54 @@ L.Handler.BearingBase = L.Handler.extend({
     this.origin = null;
   },
   _setBearing: function(e) {
-    let bp = this._control._routes
-      .getLayer(this.origin.options.routeId)
-        .createBearing(e.latlng, this.origin);
+    new L.Marker.Bearing(e.latlng, L.extend({ draggable:true }, this.options.marker, { trace: this.options.trace }) )
+      .setOrigin(this.origin)
+      .addTo(this.bearings);
 
-    bp.dragging.enable();
+    // this.origin.on('move', this._updateOrigin)
     this.disable();
   },
-  _drawPointerTrace: function(e) {
-    this._pointerTrace.setLatLngs([this.origin.getLatLng(), e.latlng]);
+  _drawPointer: function(e) {
+    this._pointer.setLatLngs([this.origin.getLatLng(), e.latlng]);
   },
-  _clearPointerTrace: function() {
-    this._pointerTrace.setLatLngs([]);
+  _clearPointer: function() {
+    this._pointer.setLatLngs([]);
   },
   _onKeyDown: function(e) {
     switch(e.keyCode) {
       case 27 : this.disable(); break;//ESC
     }
   }
+});
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! leaflet */ "leaflet")))
+
+/***/ }),
+
+/***/ "./js/Handler.ClearBase.js":
+/*!*********************************!*\
+  !*** ./js/Handler.ClearBase.js ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(L) {L.Handler.ClearBase = L.Handler.extend({
+  initialize: function (control, options) {
+    L.Util.setOptions(this, options);
+    this._control = control;
+  },
+  addHooks: function() {
+    this.target.style.filter = 'invert(1)';
+    this._control._routes.clearLayers();
+    this._control.options.tools.track.handler.trace.setLatLngs([]);
+    map.fire('traceroute:clear');
+
+    this.disable();
+  },
+  removeHooks: function() {
+    this.target.style.filter = 'invert(0)';
+    return false;
+  },
 });
 
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! leaflet */ "leaflet")))
@@ -1096,29 +1155,33 @@ __webpack_require__.r(__webpack_exports__);
 
 // Handle while waiting to start/resume a route
 L.Handler.RouteBase = L.Handler.extend({
-  initialize: function (control) {
-    this._control = control;
-    this.startHandler = new L.Handler.RouteStart(control);
+  initialize: function (control, options) {
+    L.Util.setOptions(this, options);
+    this._control = control; // only for handlers (Base and Bearing)
+// TODO: Send _routes here
+  // this._routes = L.layerGroup()
+  //   .addTo(map);
+    this.startHandler = new L.Handler.RouteStart(control._routes, options);
   },
   addHooks: function() {
-    this._control.handlers.bearing.disable();
-    this._control.handlers.base.enable();
+    this._control.options.tools.bearing.handler.disable();
+    this._control.handler.enable();
     this.target.style.filter = 'invert(1)';
 
     L.DomEvent
       .on(document, 'keydown', this._onKeyDown, this);
     map
-      .fire('traceroute:trace:start', this._control);
+      .fire('traceroute:route:start', this._control);
     this.startHandler.enable();
   },
   removeHooks: function() {
     L.DomEvent
       .off(document, 'keydown', this._onKeyDown, this);
     map
-      .fire('traceroute:trace:stop', this._control);
+      .fire('traceroute:route:stop', this._control);
 
     this.target.style.filter = 'invert(0)';
-    this._control.handlers.base.disable();
+    this._control.handler.disable();
     this.startHandler.traceHandler.disable();
     this.startHandler.disable();
   },
@@ -1147,19 +1210,25 @@ L.Handler.RouteEdit = L.Handler.extend({
   },
   addHooks: function() {
     this._route.midpoints
+      .bindTooltip(this._route.options.midpoint.tooltip, { direction: 'auto' })
       .on('click', this._route.createWaypoint, this._route);
 
+    // FIXME: Tooltip Error: Unable to get source layer LatLng. with permanent: true, : https://github.com/Leaflet/Leaflet/issues/6938
     this._route.waypoints
+      .bindTooltip(this._route.options.waypoint.tooltip, { direction: 'auto' })
+      .unbindPopup()
       .on('contextmenu', this._removeLayer, this._route.waypoints)
       .eachLayer(layer => layer.dragging.enable());
-  // TODO: midpoints popup & tooltip presence should be here
   },
 
   removeHooks: function() {
     this._route.midpoints
+      .unbindTooltip()
       .off('click', this._route.createWaypoint, this._route);
 
     this._route.waypoints
+      .unbindTooltip()
+      .bindPopup(this._route.options.waypoint.popup)
       .off('contextmenu', this._removeLayer, this._route.waypoints)
       .eachLayer(layer => layer.dragging.disable());
   },
@@ -1187,15 +1256,16 @@ __webpack_require__.r(__webpack_exports__);
 
 // Handle while control is enabled
 L.Handler.RouteStart = L.Handler.extend({
-  initialize: function (control) {
-    this._control = control;
-    this.traceHandler = new L.Handler.RouteTrace(control);
+  initialize: function(routes, options) {
+    L.Util.setOptions(this, options);
+    this._routes = routes; // only for routes
+    this.traceHandler = new L.Handler.RouteTrace(this, routes, options);
   },
   addHooks: function() {
     map
       .on('click', this._startRoute, this)
 
-    this._control._routes.eachLayer(function(route) {
+    this._routes.eachLayer(function(route) {
       route.editHandler.enable();
       route.waypoints.on('click', this._resumeRoute, this)
     }, this);
@@ -1204,7 +1274,7 @@ L.Handler.RouteStart = L.Handler.extend({
     map
       .off('click', this._startRoute, this)
 
-    this._control._routes.eachLayer(function(route) {
+    this._routes.eachLayer(function(route) {
       route.editHandler.disable();
       route.waypoints.off('click', this._resumeRoute, this)
     }, this);
@@ -1214,7 +1284,7 @@ L.Handler.RouteStart = L.Handler.extend({
     this.traceHandler._createPoint(e);
   },
   _resumeRoute: function(e) {
-    this.traceHandler._route = this._control._routes.getLayer(e.layer.options.routeId);
+    this.traceHandler._route = this._routes.getLayer(e.layer.options.routeId);
     this.traceHandler._route.editHandler.disable();
     this.traceHandler.enable();
     },
@@ -1233,23 +1303,23 @@ L.Handler.RouteStart = L.Handler.extend({
 
 /* WEBPACK VAR INJECTION */(function(L) {// Handle interactions while adding Waypoints one after another.
 L.Handler.RouteTrace = L.Handler.extend({
-  initialize: function (control) {
-    this._control = control;
-    this._pointerTrace = new L.Geodesic([], this._control.options.pointerTrace);
+  initialize: function(parent, routes, options) {
+    L.Util.setOptions(this, options);
+    this._parent = parent;
+    this._routes = routes;
+    this._pointerTrace = new L.Geodesic([], options.pointer);
   },
   addHooks: function() {
-    this._control.handlers.route.startHandler.disable();
+    this._parent.disable();
     this._clearPointerTrace();
     this._pointerTrace.addTo(map);
     map
-      .on('mousemove', this._drawPointerTrace, this)
+      .on('mousemove', this._drawPointer, this)
       .on('click', this._createPoint, this);
     L.DomEvent
       .on(document, 'keydown', this._onKeyDown, this);
 
-    if (!this._route) {
-      this._createRoute();
-    }
+    if (!this._route) this._createRoute();
 
     this._route.waypoints
       .on('click', this._finishRouteIfLast, this);
@@ -1260,7 +1330,7 @@ L.Handler.RouteTrace = L.Handler.extend({
     this._pointerTrace.removeFrom(map);
 
     map
-      .off('mousemove', this._drawPointerTrace, this)
+      .off('mousemove', this._drawPointer, this)
       .off('click', this._createPoint, this);
     L.DomEvent
       .off(document, 'keydown', this._onKeyDown, this);
@@ -1269,17 +1339,15 @@ L.Handler.RouteTrace = L.Handler.extend({
       .off('click', this._finishRouteIfLast, this);
 
     this._route = null;
-    this._control.handlers.route.startHandler.enable();
+    this._parent.enable();
   },
   _createRoute: function() {
     map.fire('traceroute:route:new', this._route);
-    return this._route = new L.LayerGroup.Route([], this._control.options)
-      .addTo(this._control._routes);
+    return this._route = new L.LayerGroup.Route([], this.options)
+      .addTo(this._routes);
   },
   _createPoint: function(e) {
-    if (!this._route) {
-      this._createRoute();
-    }
+    if (!this._route) this._createRoute();
     return this._route.createWaypoint(e);
   },
   _finishRouteIfLast: function(e) {
@@ -1298,7 +1366,7 @@ L.Handler.RouteTrace = L.Handler.extend({
     this.disable();
     return this._route;
   },
-  _drawPointerTrace: function(e) {
+  _drawPointer: function(e) {
     if(this._route && this._route.waypoints.last()) {
       this._pointerTrace.setLatLngs([this._route.waypoints.last().getLatLng(), e.latlng]);
     }
@@ -1353,22 +1421,26 @@ L.Handler.Traceroute = L.Handler.extend({
 /*!*********************************!*\
   !*** ./js/Handler.TrackBase.js ***!
   \*********************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(L) {L.Handler.TrackBase = L.Handler.extend({
-  initialize: function (control) {
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* WEBPACK VAR INJECTION */(function(L) {/* harmony import */ var _Marker_Trackpoint__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Marker.Trackpoint */ "./js/Marker.Trackpoint.js");
+
+
+
+L.Handler.TrackBase = L.Handler.extend({
+  initialize: function (control, options) {
+    L.Util.setOptions(this, options);
     this._control = control;
 
-
     this.marker = new L.Marker.Trackpoint([],
-      L.extend({ }, this._control.options.trackpoint))
+      L.extend({ }, this.options.marker))
+      .bindTooltip(this.options.marker.tooltip, { direction: 'auto' })
 
-    this.reportedpoints = new L.FeatureGroup.Ordered()
-      .bindTooltip(this.marker.options.tooltip, { direction: 'auto' })
-
-    this.trace = new L.Polyline([], this._control.options.trace)
-    this.circle = new L.Circle([], this._control.options.trackcircle)
+    this.trace = new L.Polyline([], this.options.trace)
+    this.circle = new L.Circle([], this.options.circle)
   },
   addHooks: function() {
     this.target.style.filter = 'invert(1)';
@@ -1376,7 +1448,7 @@ L.Handler.Traceroute = L.Handler.extend({
     map
       .on('locationfound', this._locationFound, this)
       .on('locationerror', this._locationError, this)
-      .locate(L.extend({ watch: true }, this._control.options.track))
+      .locate(L.extend({ watch: true }, this.options.locate))
       .fire('traceroute:track:start', this);
     this.trace.addTo(map);
   },
@@ -1394,7 +1466,8 @@ L.Handler.Traceroute = L.Handler.extend({
       if (map.hasLayer(this.marker)) {
           estimated = {
             bearing: (this.marker.bearing(e.latlng)),
-            speed: this.marker.distance(e.latlng) / Math.floor((e.timestamp - this.marker.position.timestamp)/1000)
+            estimatedSpeed: this.marker.distance(e.latlng) / Math.floor((e.timestamp - this.marker.position.timestamp)/1000),
+            vario: (this.marker.position.altitude - e.altitude) / Math.floor((e.timestamp - this.marker.position.timestamp)/1000)
           }
       }
 
@@ -1402,7 +1475,7 @@ L.Handler.Traceroute = L.Handler.extend({
       .setLatLng(e.latlng)
       .addTo(map)
       .setOpacity(1)
-      .bindTooltip(this.marker.options.tooltip, { direction: 'auto' })
+      // .bindTooltip(this.marker.options.tooltip, { direction: 'auto' })
       .decorate(L.extend(estimated, e))
 
     this.circle
@@ -1417,9 +1490,10 @@ L.Handler.Traceroute = L.Handler.extend({
       .fire('traceroute:track:found', e)
   },
   _locationError: function(e) {
+    // Start a new polyine segment
     this.marker
       .setOpacity(0.5)
-      .bindTooltip('Location lost', { direction: 'auto' })
+      // .bindTooltip('Location lost', { direction: 'auto' })
       .addTo(map);
   }
 });
@@ -1556,10 +1630,11 @@ L.LayerGroup.Route = L.LayerGroup.extend({
   options: {
     bubblingMouseEvents: false,
     trace: {bubblingMouseEvents: false},
-    waypoint: {bubblingMouseEvents: false},
+    waypoint: {bubblingMouseEvents: false, draggable:true},
     midpoint: {bubblingMouseEvents: false},
   },
   initialize: function(layer, options) {
+    // FIXME: deepmerge issue
     for (let [key, value] of Object.entries(this.options)) {
       if (options.hasOwnProperty(key)) {
         L.extend(options[key], value);
@@ -1569,48 +1644,26 @@ L.LayerGroup.Route = L.LayerGroup.extend({
 
     this._layers = {};
     this.editHandler = new L.Handler.RouteEdit(this);
-    // TODO: Allow importing data to create a route
-    // layer.forEach(w => {this.waypoints.addLayer(this.drawWaypoint({latlng: coords}))});
 
     // Create container as LayerGroup fo markers and polylines
     this.trace = new L.Geodesic([], this.options.trace)
       .addTo(this);
 
     this.midpoints = new L.FeatureGroup()
-      .bindTooltip(this.options.midpoint.tooltip, { direction: 'auto' })
       .addTo(this);
 
     this.waypoints = new L.FeatureGroup.Ordered()
-      .bindPopup(this.options.waypoint.popup)
-    // FIXME: Tooltip Error: Unable to get source layer LatLng. with permanent: true, : https://github.com/Leaflet/Leaflet/issues/6938
-      .bindTooltip(this.options.waypoint.tooltip, { direction: 'auto' })
       .on('layerremove', this.clean, this)
-      .on('layeradd layerremove move', this.drawTrace, this)
-      .on('layeradd layerremove move', this.drawBearings, this)
+      .on('layeradd layerremove move', this._draw, this)
       // FIXME: context is not set to _mapToAdd
       .on('layeradd layerremove move', this._fireWithLayer, this._mapToAdd)
       .on('layeradd', function(e) {
         // FIXME: 'move' event is not propagated to FeatureGroup : https://github.com/Leaflet/Leaflet/issues/6937
         e.layer
-          .on('move', this.drawTrace, this)
-          .on('move', this.drawBearings, this)
+          .on('move', this._draw, this)
           .on('move', this._fireWithLayer, this._mapToAdd)
       }, this)
       .addTo(this);
-
-    this.bearingpoints = new L.FeatureGroup()
-      .on('layeradd layerremove move', this.drawBearings, this)
-      .on('layeradd', function(e) {
-        // FIXME: 'move' event is not propagated to FeatureGroup : https://github.com/Leaflet/Leaflet/issues/6937
-        e.layer
-          .on('move', this.drawBearings, this)
-      }, this)
-      .bindTooltip(this.options.bearingpoint.tooltip, { direction: 'auto' })
-      .addTo(this);
-
-    this.bearings = new L.Polyline([], this.options.bearings)
-      .addTo(this);
-
   },
   clean: function() {
     if (this.waypoints.getLayers().length < 2) {
@@ -1621,77 +1674,183 @@ L.LayerGroup.Route = L.LayerGroup.extend({
     }
   },
   createWaypoint: function(e) {
-    // FIXME: inserted new waypoint should be draggable
-    let wp = new L.Marker.Waypoint(e.latlng,
-      L.extend({ routeId: L.Util.stamp(this) }, this.options.waypoint)
-    );
-    if (e.layer && e.layer.options.insertAfter) {
-      this.waypoints.insertLayer(wp, e.layer.options.insertAfter);
-    } else {
-      this.waypoints.addLayer(wp);
-    }
-    return wp;
+    return new L.Marker.Waypoint(e.latlng, this.options.waypoint)
+      .setSiblings(...(e.layer ? [e.layer.previous, e.layer.next] : [null, null]))
+      .addTo(this.waypoints);
   },
-  createBearing: function(latlng, origin) {
-    let bp = new L.Marker.Bearingpoint(latlng,
-      L.extend({ origin: origin }, this.options.bearingpoint)
-    )
-    this.bearingpoints.addLayer(bp);
-    return bp;
-  },
-  drawBearings: function() {
-    let traces = [];
-    this.bearingpoints.eachLayer(function(bp) {
-      traces.push([bp.getLatLng(), bp.options.origin.getLatLng()]);
-      bp.decorate(bp.options.origin);
-    });
-
-    this.bearings.setLatLngs(traces);
-  },
-  drawTrace: function(e) {
-    let points = this.waypoints.getLayers();
-
-    this.trace.setLatLngs(points.map(m => m.getLatLng()));
+  _draw: function(e) {
+    this.trace.setLatLngs([]);
     this.midpoints.clearLayers();
 
-    if(points.length >= 2) {
-      points.reduce((prev, current) => {
-      if (this.options.midpoint) {
-        this._drawMidpoint(prev, current).addTo(this.midpoints);
-      }
-      this._decorateWaypoint(prev, current);
-      return current
-      })
-    }
+    e.layer.start()
+      .follow(layer => {
+        layer
+          .decorate();
+        this.trace
+          .addLatLng(layer.getLatLng());
+        // if (layer.previous instanceof L.Marker.Waypoint) this.midpoints
+        //   .addLayer(
+        //     this._drawMidpoint(layer.previous, layer)
+        //   );
+      });
+
     this._mapToAdd.fire('traceroute:route:update', this);
   },
-  _drawMidpoint: function(start, end) {
-    let rotation = this.trace.geom.geodesic.inverse(start.getLatLng(), end.getLatLng());
-    rotation = Math.round((rotation.initialBearing + rotation.finalBearing) / 2) % 360;
+  _drawMidpoint: function(prev, next) {
+    if (prev instanceof L.Marker.Waypoint && next instanceof L.Marker.Waypoint) {
+      console.log ({i, f} = this.trace.geom.geodesic.inverse(prev.getLatLng(), next.getLatLng()))
 
-    return new L.Marker(
-      this.trace.geom.geodesic.midpoint(start.getLatLng(), end.getLatLng()),
-      L.extend({ rotationAngle: rotation, routeId: L.Util.stamp(this), insertAfter : L.Util.stamp(start) }, this.options.midpoint))
-  },
-  _decorateWaypoint: function(prev, next) {
-    let params = this.trace.geom.geodesic.inverse(prev.getLatLng(), next.getLatLng());
-    prev.route.out = Number(params.initialBearing.toPrecision(5));
-    next.route.in = Number(params.finalBearing.toPrecision(5));
-    next.route.distance = Number(params.distance.toPrecision(5));
-    next.route.totalDistance = (prev.route.totalDistance || 0) + next.route.distance;
-
-    prev.togglePopup().togglePopup().toggleTooltip().toggleTooltip();
-    next.togglePopup().togglePopup().toggleTooltip().toggleTooltip();
-    return [prev, next];
+      let rotation = this.trace.geom.geodesic.inverse(prev.getLatLng(), next.getLatLng());
+      rotation = Math.round((rotation.initialBearing + rotation.finalBearing) / 2) % 360;
+      let mp = new L.Marker(
+        this.trace.geom.geodesic.midpoint(prev.getLatLng(), next.getLatLng()),
+        L.extend({ rotationAngle: rotation, routeId: L.Util.stamp(this), insertAfter : L.Util.stamp(prev) }, this.options.midpoint))
+        mp.previous = prev;
+        mp.next = next;
+        return mp
+    } else {
+      return null
+    }
   },
   _fireWithLayer: function(e) {
-    // console.log(this, e.layer);
     // FIXME: fire add and remove event
     this.fire(`traceroute:waypoint:${e.type.replace('layer','')}`, e.layer || e.target)
   },
-  import: () => {},
-  export: function() {
-    return this.waypoints.getLayers().map(w => w.route)
+});
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! leaflet */ "leaflet")))
+
+/***/ }),
+
+/***/ "./js/Marker.Bearing.js":
+/*!******************************!*\
+  !*** ./js/Marker.Bearing.js ***!
+  \******************************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* WEBPACK VAR INJECTION */(function(L) {/* harmony import */ var _Marker_Traceroute__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Marker.Traceroute */ "./js/Marker.Traceroute.js");
+/* harmony import */ var _Marker_Traceroute__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_Marker_Traceroute__WEBPACK_IMPORTED_MODULE_0__);
+
+
+L.Marker.Bearing = L.Marker.Traceroute.extend({
+  initialize: function(latlng, options) {
+    this.trace = new L.Polyline([], options.trace);
+    delete options.trace;
+
+    this
+      .on('move', this._decorate, this)
+      .on('move', this._draw, this)
+
+    Object.getPrototypeOf(Object.getPrototypeOf(this)).initialize.call(this, latlng, options);
+  },
+  onAdd: function(map) {
+    this.trace.addTo(map);
+    Object.getPrototypeOf(Object.getPrototypeOf(this)).onAdd.call(this, map);
+  },
+  onRemove: function(map) {
+    this.trace.remove();
+    Object.getPrototypeOf(Object.getPrototypeOf(this)).onRemove.call(this, map);
+  },
+  bearing: {},
+  setOrigin: function(origin) {
+    this.origin = origin;
+    origin
+      .on('remove', this.remove, this)
+      .on('move remove', this._decorate, this)
+      .on('move remove', this._draw, this)
+      .bearings.push(this);
+    this
+      ._decorate()
+      ._draw();
+    return this;
+  },
+  // TODO: assert if removeOrgin() could be useful.
+  _decorate: function() {
+    if (this.origin instanceof L.Marker.Waypoint) {
+      this.bearing.qdr = Number(this.bearingTo(this.origin.getLatLng()).toPrecision(5));
+      this.bearing.qdm = Number(this.origin.bearingTo(this._latlng).toPrecision(5));
+      this.bearing.distance = Number(this.distanceTo(this.origin.getLatLng()).toPrecision(5));
+    }
+    this.toggleTooltip().toggleTooltip();
+    return this
+  },
+  _draw: function() {
+    this.trace.setLatLngs([this._latlng, this.origin.getLatLng()])
+    return this
+  },
+});
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! leaflet */ "leaflet")))
+
+/***/ }),
+
+/***/ "./js/Marker.Traceroute.js":
+/*!*********************************!*\
+  !*** ./js/Marker.Traceroute.js ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(L) {L.Marker.Traceroute = L.Marker.extend({
+  options: {
+    autoPan: true
+  },
+  bearingTo: function(latlng) {
+    // https://github.com/makinacorpus/Leaflet.GeometryUtil
+    let rad = Math.PI / 180,
+        lat1 = this._latlng.lat * rad,
+        lat2 = latlng.lat * rad,
+        lon1 = this._latlng.lng * rad,
+        lon2 = latlng.lng * rad,
+        y = Math.sin(lon2 - lon1) * Math.cos(lat2),
+        x = Math.cos(lat1) * Math.sin(lat2) -
+            Math.sin(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1);
+    return ((Math.atan2(y, x) * 180 / Math.PI) + 360) % 360;
+  },
+  distanceTo: function (latlng) {
+    return map.distance(this._latlng, latlng);
+  },
+});
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! leaflet */ "leaflet")))
+
+/***/ }),
+
+/***/ "./js/Marker.Trackpoint.js":
+/*!*********************************!*\
+  !*** ./js/Marker.Trackpoint.js ***!
+  \*********************************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* WEBPACK VAR INJECTION */(function(L) {/* harmony import */ var _Marker_Traceroute__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Marker.Traceroute */ "./js/Marker.Traceroute.js");
+/* harmony import */ var _Marker_Traceroute__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_Marker_Traceroute__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var leaflet_rotatedmarker__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! leaflet-rotatedmarker */ "../node_modules/leaflet-rotatedmarker/leaflet.rotatedMarker.js");
+/* harmony import */ var leaflet_rotatedmarker__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(leaflet_rotatedmarker__WEBPACK_IMPORTED_MODULE_1__);
+
+
+
+L.Marker.Trackpoint = L.Marker.Traceroute.extend({
+  decorate: function(e) {
+    this
+      ._extractLocation(e)
+      .setRotationAngle(e.heading || 0)
+      .toggleTooltip().toggleTooltip();
+  },
+  // setHeading: function(latlng) {
+  //   if (typeof this.position.heading == 'undefined') {
+  //     this.position.heading = (this.bearingTo(latlng) -180) % 360;
+  //   }
+  //   this.setRotationAngle(this.position.heading)
+  // },
+  _extractLocation: function(e) {
+    this.position = (({ latitude, longitude, altitude, vario, accuracy, altitudeAccuracy, heading, bearing, estimatedSpeed, speed, timestamp }) => ({ latitude, longitude, altitude, vario, accuracy, altitudeAccuracy, heading, bearing, estimatedSpeed, speed, timestamp }))(e)
+    return this
   }
 });
 
@@ -1708,80 +1867,55 @@ L.LayerGroup.Route = L.LayerGroup.extend({
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* WEBPACK VAR INJECTION */(function(L) {/* harmony import */ var leaflet_rotatedmarker__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! leaflet-rotatedmarker */ "../node_modules/leaflet-rotatedmarker/leaflet.rotatedMarker.js");
-/* harmony import */ var leaflet_rotatedmarker__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(leaflet_rotatedmarker__WEBPACK_IMPORTED_MODULE_0__);
+/* WEBPACK VAR INJECTION */(function(L) {/* harmony import */ var _Marker_Traceroute__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Marker.Traceroute */ "./js/Marker.Traceroute.js");
+/* harmony import */ var _Marker_Traceroute__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_Marker_Traceroute__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var leaflet_rotatedmarker__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! leaflet-rotatedmarker */ "../node_modules/leaflet-rotatedmarker/leaflet.rotatedMarker.js");
+/* harmony import */ var leaflet_rotatedmarker__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(leaflet_rotatedmarker__WEBPACK_IMPORTED_MODULE_1__);
 
 
-L.Marker.Traceroute = L.Marker.extend({
-  initialize: function(latlng, options) {
-    L.Marker.prototype.initialize.call(this, latlng, L.extend({ autoPan: true}, options));
-  },
-  bearing: function(latlng) {
-    // https://github.com/makinacorpus/Leaflet.GeometryUtil
-    let rad = Math.PI / 180,
-        lat1 = this._latlng.lat * rad,
-        lat2 = latlng.lat * rad,
-        lon1 = this._latlng.lng * rad,
-        lon2 = latlng.lng * rad,
-        y = Math.sin(lon2 - lon1) * Math.cos(lat2),
-        x = Math.cos(lat1) * Math.sin(lat2) -
-            Math.sin(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1);
-    return ((Math.atan2(y, x) * 180 / Math.PI) + 360) % 360;
-  },
-  distance: function (latlng) {
-    return this._map.distance(this._latlng, latlng);
-  },
-});
 
 L.Marker.Waypoint = L.Marker.Traceroute.extend({
-  initialize: function(latlng, options) {
-    L.Marker.Traceroute.prototype.initialize.call(this, latlng, options);
-    this.route = { in: 0, out: 0, distance: 0, totalDistance:0 };
+  route: { in: 0, out: 0, distance: 0, totalDistance: 0 },
+  bearings: [],
+  addBearing: function(bearing) {
+    this.bearings.push(bearing)
+    bearing.origin = this;
+    return this;
   },
-  // TODO: decorate should be here, need next prev method on ordered layer
-  // _decorate: function(prev, next) {
-  //
-  //   this.route.position = this._latlng
-  //   this.route.in = geodesic.inverse(prev.getLatLng(), this.getLatLng());
-  //   this.route.out = geodesic.inverse(this.getLatLng(), next.getLatLng());
-  //   this.togglePopup().togglePopup().toggleTooltip().toggleTooltip();
-  //
-  //   this.route.position = this._latlng
-  //   this.route.out = geodesic.inverse(this.getLatLng(), next.getLatLng());
-  //   next.route.in
-  // },
-});
-
-L.Marker.Bearingpoint = L.Marker.Traceroute.extend({
-  initialize: function(latlng, options) {
-    L.Marker.Traceroute.prototype.initialize.call(this, latlng, options);
-// TODO: bring bearing logic and trace inside Targetpoint
-  },
-  decorate: function(origin) {
-    this.bearing.qdr = Number(this.bearing(origin.getLatLng()).toPrecision(5));
-    this.bearing.qdm = Number(origin.bearing(this._latlng).toPrecision(5));
-    this.bearing.distance = Number(this.distance(origin.getLatLng()).toPrecision(5));
-    this.toggleTooltip().toggleTooltip();
-    return this
-  },
-});
-
-L.Marker.Trackpoint = L.Marker.Traceroute.extend({
-  decorate: function(e) {
+  setSiblings: function(previous, next) {
+    if (previous != null) { this.previous = previous }
+    if (next != null) { this.next = next }
     this
-      ._extractLocation(e)
-      .setRotationAngle(e.heading || 0)
-      .toggleTooltip().toggleTooltip();
+      ._decorate()
+      .fire('update', this, true);
+    return this;
   },
-  // setHeading: function(latlng) {
-  //   if (typeof this.position.heading == 'undefined') {
-  //     this.position.heading = (this.bearing(latlng) -180) % 360;
-  //   }
-  //   this.setRotationAngle(this.position.heading)
-  // },
-  _extractLocation: function(e) {
-    this.position = (({ latitude, longitude, altitude, accuracy, altitudeAccuracy, heading, bearing, speed, timestamp }) => ({ latitude, longitude, altitude, accuracy, altitudeAccuracy, heading, bearing, speed, timestamp }))(e)
-    return this
+  _decorate: function() {
+    this.route.position = this._latlng;
+    let geodesic = new L.Geodesic();
+
+    if(this.previous instanceof L.Marker.Waypoint) {
+      this.route.in = geodesic.inverse(this.previous.getLatLng(), this.getLatLng());
+    }
+    if(this.next instanceof L.Marker.Waypoint) {
+      this.route.out = geodesic.inverse(this.getLatLng(), this.next.getLatLng());
+    }
+    this.togglePopup().togglePopup().toggleTooltip().toggleTooltip();
+    return this;
+  },
+  follow: function(fcn) {
+    let mkr = this;
+    do {
+      fcn.call(this, mkr);
+      mkr = mkr.next;
+    } while(mkr.next instanceof L.Marker.Waypoint)
+  },
+  start: function() {
+    let mkr = this;
+    while(mkr.previous instanceof L.Marker.Waypoint) {
+      mkr = mkr.previous;
+    }
+    return mkr
   }
 });
 

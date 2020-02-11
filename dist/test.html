@@ -39,16 +39,8 @@
 
   var map = new L.Map ('map')
   .addLayer(layerOsm)
-  // .addLayer(layerAIP)
+  .addLayer(layerAIP)
   .setView (new L.LatLng(43.215398,0.078266), 14);
-
-  function wrapit(p){ 
-    return {
-      prev_id: p.previous? p.previous._leaflet_id : null, 
-      id: p._leaflet_id,
-      next_id: p.next? p.next._leaflet_id : null,
-    }
-  }
 
   var traceroute = L.control.traceroute({
     position: 'bottomleft',
@@ -56,48 +48,48 @@
       route: {
         // trace: { weight: 5, opacity: 1, color: 'pink' },
         // pointer: { dashArray: '8', color: 'green' },
-        // icon: '⥉', 
-        waypoint: {
-          // tooltip: p => `<pre id='json'>${JSON.stringify(wrapit(p), null, 2)}</pre>`,
-          tooltip: p => `<pre id='json'>${JSON.stringify(L.Control.Traceroute.extractData(p.export()), null, 2)}</pre>`,
-          // popup: null,
-        }
+        icon: '⥉', 
+      },
+      bearing: {
+         icon: '🧭',// 🧭∢∠
+      },
+      clear: {
+        icon: '⥇',
       }
     }
   }).addTo(map);
+
 
   function updateMarker(formElement) {
     console.log(Array.from(new FormData(formElement).entries()));
   }
 
-  function debugEvent(e) {
-    console.debug(e.type, e);
-  }
+  var debugE = e => console.debug(e.type, e)
 
-  // map.on('traceroute:route:start', debugEvent);
-  // map.on('traceroute:route:stop', debugEvent);
-  // map.on('traceroute:route:update', debugEvent);
-  map.on('traceroute:route:new', debugEvent);
-  // map.on('traceroute:route:finish', debugEvent);
-  // map.on('traceroute:route:abort', debugEvent);
-  // map.on('traceroute:route:resume', debugEvent);
-  //
-  // map.on('traceroute:clear', debugEvent);
+  map.on('traceroute:route:start', debugE);
+  map.on('traceroute:route:stop', debugE);
+  map.on('traceroute:route:update', debugE);
+  map.on('traceroute:route:new', debugE);
+  map.on('traceroute:route:finish', debugE);
+  map.on('traceroute:route:abort', debugE);
+  map.on('traceroute:route:resume', debugE);
 
-  map.on('traceroute:waypoint:add', debugEvent);
-  map.on('traceroute:waypoint:move', debugEvent);
-  map.on('traceroute:waypoint:remove', debugEvent);
-  map.on('traceroute:waypoint:update', debugEvent);
+  map.on('traceroute:clear', debugE);
 
-  // map.on('traceroute:bearing:start', debugEvent);
-  // map.on('traceroute:bearing:stop', debugEvent);
-  map.on('traceroute:bearing:add', debugEvent);
-  map.on('traceroute:bearing:move', debugEvent);
-  map.on('traceroute:bearing:remove', debugEvent);
+  map.on('traceroute:waypoint:add', debugE);
+  map.on('traceroute:waypoint:move', debugE);
+  map.on('traceroute:waypoint:remove', debugE);
+  map.on('traceroute:waypoint:update', debugE);
 
-  // map.on('traceroute:track:start', debugEvent);
-  // map.on('traceroute:track:stop', debugEvent);
-  map.on('traceroute:track:found', debugEvent);
+  map.on('traceroute:bearing:start', debugE);
+  map.on('traceroute:bearing:stop', debugE);
+  map.on('traceroute:bearing:add', debugE);
+  map.on('traceroute:bearing:move', debugE);
+  map.on('traceroute:bearing:remove', debugE);
+
+  map.on('traceroute:track:start', debugE);
+  map.on('traceroute:track:stop', debugE);
+  map.on('traceroute:track:found', debugE);
 
   </script>
 </html>

@@ -37,6 +37,16 @@ L.LayerGroup.Route = L.LayerGroup.extend({
           .on('move', this._fireWithLayer, this)
       }, this)
       .addTo(this);
+
+    this.data = {};
+  },
+  export: function() {
+    this.data.id = this._leaflet_id;
+
+    this.data.waypoints = [];
+    this.waypoints.getLayers()[0].tolast(l => this.data.waypoints.push( l.export()) );
+
+    return this.data
   },
   clean: function () {
     if (this.waypoints.getLayers().length < 2) {

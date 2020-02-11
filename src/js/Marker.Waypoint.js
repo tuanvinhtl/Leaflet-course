@@ -5,16 +5,17 @@ import 'leaflet.geodesic';
 L.Marker.Waypoint = L.Marker.Traceroute.extend({
   geodesic: L.geodesic().geom.geodesic,
   export: function () {
+    this.data.id = this._leaflet_id;
+
     if (typeof this.fellow.bearings != 'undefined') this.data.bearings = this.fellow.bearings.map(b => b.export());
-    // if (this.previous instanceof L.Marker.Waypoint) Object.assign(this.data, { previous: this.previous.export() });
-    // if (this.next instanceof L.Marker.Waypoint) Object.assign(this.data, { next: this.next.export() });
+    if (this.previous instanceof L.Marker.Waypoint) this.data.previous_id = this.previous._leaflet_id;
+    if (this.next instanceof L.Marker.Waypoint) this.data.next_id = this.next._leaflet_id;
 
     return this.data
   },
-  addBearing: function(bearing) {
+  registerBearing: function(bearing) {
     if (typeof this.fellow.bearings == 'undefined') this.fellow.bearings = [];
     this.fellow.bearings.push(bearing)
-    bearing.origin = this;
     return this;
   },
   setSiblings: function(previous, next) { 

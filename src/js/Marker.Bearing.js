@@ -20,37 +20,42 @@ L.Marker.Bearing = L.Marker.Traceroute.extend({
     Object.getPrototypeOf(Object.getPrototypeOf(this)).onRemove.call(this, map);
   },
   bearing: {},
+
   export: function () {
-    let data = {};
-    data.position = this._latlng;
+    this.data.id = this._leaflet_id;
 
-    if (typeof this.route != 'undefined') Object.assign(data, this.bearing);
-
-    return data
+    if (this.fellow.origin instanceof L.Marker.Waypoint) this.data.origin_id = this.fellow.origin._leaflet_id;
+  
+    return this.data
   },
   setOrigin: function(origin) {
+    this.fellow.origin = origin;
     origin
-      .on('remove', this.remove, this)
-      .on('move remove', this._decorate, this)
-      .on('move remove', this._draw, this)
-      .addBearing(this);
+    .on('remove', this.remove, this)
+    .on('move remove', this._decorate, this)
+    .on('move remove', this._draw, this)
+    .registerBearing(this);
     this
-      ._decorate()
-      ._draw();
+    ._decorate()
+    ._draw();
+
     return this;
   },
-  // TODO: assert if removeOrgin() could be useful.
   _decorate: function() {
-    if (this.origin instanceof L.Marker.Waypoint) {
-      this.data.qdr = Number(this.bearingTo(this.origin.getLatLng()).toPrecision(5));
-      this.data.qdm = Number(this.origin.bearingTo(this._latlng).toPrecision(5));
-      this.data.distance = Number(this.distanceTo(this.origin.getLatLng()).toPrecision(5));
+    this.data.position = this._latlng;
+    
+    if (this.fellow.origin instanceof L.Marker.Waypoint) {
+      this.data.qdr = Number(this.bearingTo(this.fellow.origin.getLatLng()).toPrecision(5));
+      this.data.qdm = Number(this.fellow.origin.bearingTo(this._latlng).toPrecision(5));
+      this.data.distance = Number(this.distanceTo(this.fellow.origin.getLatLng()).toPrecision(5));
     }
+
     this.toggleTooltip().toggleTooltip();
+    
     return this
   },
   _draw: function() {
-    this.trace.setLatLngs([this._latlng, this.origin.getLatLng()])
+    this.trace.setLatLngs([this._latlng, this.fellow.origin.getLatLng()])
     return this
   },
 });
