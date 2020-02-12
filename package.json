@@ -1,7 +1,6 @@
 {
   "name": "leaflet-traceroute",
-  "version": "1.0.0",
-  "private": true,
+  "version": "0.9.0",
   "description": "Leaflet Control to help trace a route on earth, provides distance & bearing on great circle path.",
   "main": "dist/leaflet-traceroute.js",
   "scripts": {

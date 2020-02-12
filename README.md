@@ -14,7 +14,7 @@ This plugin is heavily inspired by [Leaflet.PolylineMeasure](https://github.com/
 * Work on **touchscreen** too. *rightclick* become *long press*
 
 ## Demo
-* Please take a look at the [**Demo**](https://elmatou.github.io/Leaflet-control-traceroute/dist/demo.html)
+* Please take a look at the [**Demo**](https://elmatou.github.io/Leaflet-traceroute/dist/demo.html)
 
 ## Usage
 
@@ -106,6 +106,13 @@ eg: this one will disable the bearing measurement and track tools. It also will 
   }
 ```
 You can also create a new tool prety easily. see the [extend section](##Extend the plugin with new tool) below, or ask in the issues tracker.
+
+## Styling
+Traces and lines are styled in options with corresponding Leaflet object.
+
+Markers icons are styled with embedded CSS. You can see it [in source](/src/css/trace.css).
+
+You can create new classes based on the current, just be sure to set the orientation of tracker or arrow icons.
 
 ## Data structure
 We use subclasses of leaflet objects.
@@ -202,7 +209,7 @@ map.on(
 );
 ```
 
-Please take a look at the [**Demo**](https://elmatou.github.io/Leaflet-control-traceroute/dist/demo.html) each event is printed in the console.
+Please take a look at the [**Demo**](https://elmatou.github.io/Leaflet-traceroute/dist/demo.html) each event is printed in the console.
 
 ## Helpers
 the library come with some handy function to help you.
@@ -214,7 +221,7 @@ L.Control.Traceroute.extract(data); // from (<Marker.Waypoint> | <Marker.Bearing
 
 ## Extend the plugin with new tool
 
-It is pretty easy to extend the plugin with new tools. You basicaly need to do two thtings :
+It is pretty easy to extend the plugin with new tools. You basicaly need to do two things :
 
   * add your tool part in options 
   ```js
