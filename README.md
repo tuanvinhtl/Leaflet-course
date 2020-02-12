@@ -29,7 +29,7 @@ Add 1 line of code within your **Javascript-file** to add the plugin's control i
   L.control.traceroute(<options ?>).addTo(map);
 ```
 
-It will be possible to install and update this plugin using package managers like `npm`.
+Alternatively you can install the plugin with npm : `npm install leaflet-traceroute`
 
 ## Options & defaults
 The default options are the following.

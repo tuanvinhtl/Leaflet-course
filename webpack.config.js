@@ -12,9 +12,8 @@ module.exports = {
     traceroute: './js/Control.Traceroute.js',
   },
   output: {
-    filename: 'leaflet-control-[name].js',
+    filename: 'leaflet-[name].js',
     path: path.resolve(__dirname, 'dist'),
-    // library: 'leaflet-traceroute',
   },
   optimization: {
     minimizer: [new TerserJSPlugin({}), new OptimizeCSSAssetsPlugin({})],
@@ -39,8 +38,6 @@ module.exports = {
     watchContentBase: true,
     https: true,
     open: true,
-    // openPage: ['demo.html'],
     openPage: ['webpack-dev-server/test.html'],
-    // bonjour: true
   }
 };
