@@ -20,7 +20,7 @@ L.Handler.TrackBase = L.Handler.extend({
       .on('locationfound', this._locationFound, this)
       .on('locationerror', this._locationError, this)
       .locate(L.extend({ watch: true }, this.options.locate))
-      .fire('traceroute:track:start', this);
+      .fire('traceroute:track:start', this._control);
     this.trace.addTo(map);
   },
   removeHooks: function() {
@@ -28,7 +28,7 @@ L.Handler.TrackBase = L.Handler.extend({
 
     map
       .stopLocate()
-      .fire('traceroute:track:stop', this)
+      .fire('traceroute:track:stop', this._control)
       .off('locationfound', this._locationFound, this)
       .off('locationerror', this._locationError, this);
   },
@@ -65,5 +65,7 @@ L.Handler.TrackBase = L.Handler.extend({
       .setOpacity(0.5)
       // .bindTooltip('Location lost', { direction: 'auto' })
       .addTo(map);
+    map
+      .fire('traceroute:track:error', e)
   }
 });

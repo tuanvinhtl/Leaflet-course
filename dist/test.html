@@ -44,18 +44,21 @@
 
   var traceroute = L.control.traceroute({
     position: 'bottomleft',
+    cursor: 'copy',
     tools: {
       route: {
         // trace: { weight: 5, opacity: 1, color: 'pink' },
         // pointer: { dashArray: '8', color: 'green' },
         icon: '⥉', 
+        // waypoint: {
+        //   popup: undefined,
+        // },
+        // midpoint: {
+        //   tooltip: undefined,
+        // }
       },
-      bearing: {
-         icon: '🧭',// 🧭∢∠
-      },
-      clear: {
-        icon: '⥇',
-      }
+      // bearing: undefined,
+      // track: undefined,
     }
   }).addTo(map);
 

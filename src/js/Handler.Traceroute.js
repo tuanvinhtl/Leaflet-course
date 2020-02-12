@@ -7,7 +7,7 @@ L.Handler.Traceroute = L.Handler.extend({
   addHooks: function() {
     // TODO: Make pointer customizable
     this._oldSettings.cursor = map._container.style.cursor;
-    map._container.style.cursor = 'crosshair';
+    map._container.style.cursor = this._control.options.cursor;
     this._oldSettings.doubleClickZoom = map.doubleClickZoom.enabled();
     map.doubleClickZoom.disable();
   },

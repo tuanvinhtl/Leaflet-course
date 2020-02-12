@@ -41,8 +41,6 @@ L.Handler.BearingTrace = L.Handler.extend({
     new L.Marker.Bearing(e.latlng, L.extend({ draggable:true }, this.options.marker, { trace: this.options.trace }) )
       .setOrigin(this.origin)
       .addTo(this.bearings);
-
-    // this.origin.on('move', this._updateOrigin)
     this.disable();
   },
   _drawPointer: function(e) {

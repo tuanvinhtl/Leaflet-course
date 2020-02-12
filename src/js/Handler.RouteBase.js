@@ -11,7 +11,7 @@ L.Handler.RouteBase = L.Handler.extend({
     this.startHandler = new L.Handler.RouteStart(control._routes, options);
   },
   addHooks: function() {
-    this._control.options.tools.bearing.handler.disable();
+    if (typeof this._control.options.tools.bearing != 'undefined') this._control.options.tools.bearing.handler.disable();
     this._control.handler.enable();
     this.target.style.filter = 'invert(1)';
 

@@ -6,6 +6,7 @@ L.Handler.BearingBase = L.Handler.extend({
     this._control = control;
 
     this.bearings = new L.FeatureGroup()
+//TODO add event for add remove & move.
       .addTo(map);
 
     this.traces = new L.Polyline([], this.options.trace)

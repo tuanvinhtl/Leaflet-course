@@ -11,6 +11,7 @@ import '../css/trace.css';
 
 L.Control.Traceroute = L.Control.extend({
   options: {
+    cursor: 'crosshair',
     tools: {
       route: {
         icon: '☡',
@@ -65,7 +66,7 @@ L.Control.Traceroute = L.Control.extend({
     this.handler = new L.Handler.Traceroute(this);
 
     for (let tool of Object.values(this.options.tools)) {
-      tool.handler = new tool.handler(this, tool);
+      if (typeof tool != 'undefined') tool.handler = new tool.handler(this, tool);
     }
 
   },
@@ -78,7 +79,7 @@ L.Control.Traceroute = L.Control.extend({
     L.DomEvent.disableClickPropagation(linksContainer);
 
     for (const tool of Object.values(this.options.tools)) {
-      linksContainer.appendChild(
+      if (typeof tool != 'undefined') linksContainer.appendChild(
         this._createControl(tool.icon, tool.title, this._toggleMode(tool.handler))
       );
     }
@@ -180,7 +181,6 @@ L.Control.Traceroute = L.Control.extend({
       }
       return result;
     },
-    dump: function (l) { return `<pre>${JSON.stringify(this.extract(p.export()), null, 2)}</pre>` },
     mergeDeep: function thisDeep(target, ...sources) {
       const isObject = item => (item && typeof item === 'object' && !Array.isArray(item));
 
