@@ -32,8 +32,8 @@ L.Marker.Bearing = L.Marker.Course.extend({
     this.fellow.origin = origin;
     origin
     .on('remove', this.remove, this)
-    .on('move remove', this._decorate, this)
-    .on('move remove', this._draw, this)
+    .on('move', this._decorate, this)
+    .on('move', this._draw, this)
     .registerBearing(this);
     this
     ._decorate()
