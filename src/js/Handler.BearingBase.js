@@ -28,6 +28,7 @@ L.Handler.BearingBase = L.Handler.extend({
     this.bearings
       .bindTooltip(this.options.marker.tooltip, { direction: 'auto' })
       .unbindPopup()
+      .on('contextmenu', this._removeLayer, this.bearings)
       .eachLayer(marker => marker.dragging.enable());
 
     L.DomEvent
@@ -43,6 +44,7 @@ L.Handler.BearingBase = L.Handler.extend({
       this.bearings
         .bindPopup(this.options.marker.tooltip, { direction: 'auto' })
         .unbindTooltip()
+        .off('contextmenu', this._removeLayer, this.bearings)
         .eachLayer(marker => marker.dragging.disable());
 
     this._control._routes.eachLayer(function(route) {
@@ -61,7 +63,9 @@ L.Handler.BearingBase = L.Handler.extend({
     this.traceHandler.origin = e.layer;
     this.traceHandler.enable();
   },
-
+  _removeLayer: function (e) {
+    this.removeLayer(e.layer);
+  },
   _onKeyDown: function(e) {
     switch(e.keyCode) {
       case 27 : //ESC
