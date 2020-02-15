@@ -20,7 +20,7 @@ L.Marker.Traceroute = L.Marker.extend({
     return ((Math.atan2(y, x) * 180 / Math.PI) + 360) % 360;
   },
   distanceTo: function (latlng) {
-    return map.distance(this._latlng, latlng);
+    return this._map.distance(this._latlng, latlng);
   },
   export: function() {
     return {}

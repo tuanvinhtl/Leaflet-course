@@ -3,14 +3,15 @@ L.Handler.RouteTrace = L.Handler.extend({
   initialize: function(parent, routes, options) {
     L.Util.setOptions(this, options);
     this._parent = parent;
+    this._map = parent._map;
     this._routes = routes;
     this._pointerTrace = new L.Geodesic([], options.pointer);
   },
   addHooks: function() {
     this._parent.disable();
     this._clearPointerTrace();
-    this._pointerTrace.addTo(map);
-    map
+    this._pointerTrace.addTo(this._map);
+    this._map
       .on('mousemove', this._drawPointer, this)
       .on('click', this._createPoint, this);
     L.DomEvent
@@ -24,9 +25,9 @@ L.Handler.RouteTrace = L.Handler.extend({
   },
   removeHooks: function() {
     this._clearPointerTrace();
-    this._pointerTrace.removeFrom(map);
+    this._pointerTrace.removeFrom(this._map);
 
-    map
+    this._map
       .off('mousemove', this._drawPointer, this)
       .off('click', this._createPoint, this);
     L.DomEvent
@@ -39,7 +40,7 @@ L.Handler.RouteTrace = L.Handler.extend({
     this._parent.enable();
   },
   _createRoute: function() {
-    map.fire('traceroute:route:new', this._route);
+    this._map.fire('traceroute:route:new', this._route);
     return this._route = new L.LayerGroup.Route([], this.options)
       .addTo(this._routes);
   },
@@ -54,10 +55,10 @@ L.Handler.RouteTrace = L.Handler.extend({
   },
   _finishRoute: function() {
     if (this._route.clean()) {
-      map.fire('traceroute:route:finish', this._route);
+      this._map.fire('traceroute:route:finish', this._route);
       this._route.editHandler.enable();
     } else {
-      map.fire('traceroute:route:abort', this._route);
+      this._map.fire('traceroute:route:abort', this._route);
       this._route.remove();
     }
     this.disable();

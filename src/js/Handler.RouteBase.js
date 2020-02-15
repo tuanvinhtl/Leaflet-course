@@ -2,13 +2,15 @@ import './Handler.RouteStart';
 
 // Handle while waiting to start/resume a route
 L.Handler.RouteBase = L.Handler.extend({
-  initialize: function (control, options) {
+  initialize: function (map, control, options) {
     L.Util.setOptions(this, options);
-    this._control = control; // only for handlers (Base and Bearing)
+    this._map = map;
+    this._control = control;
+    
 // TODO: Send _routes here
   // this._routes = L.layerGroup()
-  //   .addTo(map);
-    this.startHandler = new L.Handler.RouteStart(control._routes, options);
+  //   .addTo(this._map);
+    this.startHandler = new L.Handler.RouteStart(this._map, control._routes, options);
   },
   addHooks: function() {
     if (typeof this._control.options.tools.bearing != 'undefined') this._control.options.tools.bearing.handler.disable();
@@ -17,14 +19,14 @@ L.Handler.RouteBase = L.Handler.extend({
 
     L.DomEvent
       .on(document, 'keydown', this._onKeyDown, this);
-    map
+    this._map
       .fire('traceroute:route:start', this._control);
     this.startHandler.enable();
   },
   removeHooks: function() {
     L.DomEvent
       .off(document, 'keydown', this._onKeyDown, this);
-    map
+    this._map
       .fire('traceroute:route:stop', this._control);
 
     this.target.style.filter = 'invert(0)';

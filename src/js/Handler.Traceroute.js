@@ -1,18 +1,19 @@
 // Handle while control is enabled
 L.Handler.Traceroute = L.Handler.extend({
-  initialize: function (control) {
+  initialize: function (map, control) {
+    this._map = map;
     this._control = control;
     this._oldSettings = {};
   },
   addHooks: function() {
     // TODO: Make pointer customizable
-    this._oldSettings.cursor = map._container.style.cursor;
-    map._container.style.cursor = this._control.options.cursor;
-    this._oldSettings.doubleClickZoom = map.doubleClickZoom.enabled();
-    map.doubleClickZoom.disable();
+    this._oldSettings.cursor = this._map._container.style.cursor;
+    this._map._container.style.cursor = this._control.options.cursor;
+    this._oldSettings.doubleClickZoom = this._map.doubleClickZoom.enabled();
+    this._map.doubleClickZoom.disable();
   },
   removeHooks: function() {
-    map._container.style.cursor = this._oldSettings.cursor;
-    if(this._oldSettings.doubleClickZoom) { map.doubleClickZoom.enable() }
+    this._map._container.style.cursor = this._oldSettings.cursor;
+    if(this._oldSettings.doubleClickZoom) { this._map.doubleClickZoom.enable() }
   },
 });

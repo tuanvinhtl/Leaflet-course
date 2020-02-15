@@ -25,7 +25,7 @@
 
 
   var layerOsm = new L.TileLayer ('https://{s}.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {subdomains:['server','services'], maxZoom:19, noWrap:false, attribution:'<a href="https://www.arcgis.com/">ArcGIS</a>' });
-  var map = new L.Map ('map').addLayer(layerOsm).setView (new L.LatLng(48, 0), 4);
+  var mop = new L.Map ('map').addLayer(layerOsm).setView (new L.LatLng(48, 0), 4);
   var traceroute = L.control.traceroute({ 
     position: 'topleft',
     tools: {
@@ -46,35 +46,35 @@
         },
       },
     }
-  }).addTo(map);
+  }).addTo(mop);
 
   var debugE = e => console.debug(e.type, e)
 
-  map.on('traceroute:route:start', debugE);
-  map.on('traceroute:route:stop', debugE);
-  map.on('traceroute:route:update', debugE);
-  map.on('traceroute:route:new', debugE);
-  map.on('traceroute:route:finish', debugE);
-  map.on('traceroute:route:abort', debugE);
-  map.on('traceroute:route:resume', debugE);
+  mop.on('traceroute:route:start', debugE);
+  mop.on('traceroute:route:stop', debugE);
+  mop.on('traceroute:route:update', debugE);
+  mop.on('traceroute:route:new', debugE);
+  mop.on('traceroute:route:finish', debugE);
+  mop.on('traceroute:route:abort', debugE);
+  mop.on('traceroute:route:resume', debugE);
 
-  map.on('traceroute:clear', debugE);
+  mop.on('traceroute:clear', debugE);
 
-  map.on('traceroute:waypoint:add', debugE);
-  map.on('traceroute:waypoint:move', debugE);
-  map.on('traceroute:waypoint:remove', debugE);
-  map.on('traceroute:waypoint:update', debugE);
+  mop.on('traceroute:waypoint:add', debugE);
+  mop.on('traceroute:waypoint:move', debugE);
+  mop.on('traceroute:waypoint:remove', debugE);
+  mop.on('traceroute:waypoint:update', debugE);
 
-  map.on('traceroute:bearing:start', debugE);
-  map.on('traceroute:bearing:stop', debugE);
-  map.on('traceroute:bearing:add', debugE);
-  map.on('traceroute:bearing:move', debugE);
-  map.on('traceroute:bearing:remove', debugE);
+  mop.on('traceroute:bearing:start', debugE);
+  mop.on('traceroute:bearing:stop', debugE);
+  mop.on('traceroute:bearing:add', debugE);
+  mop.on('traceroute:bearing:move', debugE);
+  mop.on('traceroute:bearing:remove', debugE);
 
-  map.on('traceroute:track:start', debugE);
-  map.on('traceroute:track:stop', debugE);
-  map.on('traceroute:track:found', debugE);
-  map.on('traceroute:track:error', debugE);
+  mop.on('traceroute:track:start', debugE);
+  mop.on('traceroute:track:stop', debugE);
+  mop.on('traceroute:track:found', debugE);
+  mop.on('traceroute:track:error', debugE);
 
   </script>
 </html>

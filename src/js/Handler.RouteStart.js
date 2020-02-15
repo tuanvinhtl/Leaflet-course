@@ -2,13 +2,14 @@ import './Handler.RouteTrace';
 
 // Handle while control is enabled
 L.Handler.RouteStart = L.Handler.extend({
-  initialize: function(routes, options) {
+  initialize: function(map, routes, options) {
     L.Util.setOptions(this, options);
+    this._map = map;
     this._routes = routes;
     this.traceHandler = new L.Handler.RouteTrace(this, routes, options);
   },
   addHooks: function() {
-    map
+    this._map
       .on('click', this._startRoute, this)
 
     this._routes.eachLayer(function(route) {
@@ -17,7 +18,7 @@ L.Handler.RouteStart = L.Handler.extend({
     }, this);
   },
   removeHooks: function() {
-    map
+    this._map
       .off('click', this._startRoute, this)
 
     this._routes.eachLayer(function(route) {

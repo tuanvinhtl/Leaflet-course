@@ -1,18 +1,19 @@
 import './Handler.BearingTrace';
 
 L.Handler.BearingBase = L.Handler.extend({
-  initialize: function (control, options) {
+  initialize: function (map, control, options) {
     L.Util.setOptions(this, options);
+    this._map = map;
     this._control = control;
 
     this.bearings = new L.FeatureGroup()
 //TODO add event for add remove & move.
-      .addTo(map);
+      .addTo(this._map);
 
     this.traces = new L.Polyline([], this.options.trace)
-      .addTo(map);
+      .addTo(this._map);
 
-    this.traceHandler = new L.Handler.BearingTrace(this.bearings, this.options);
+    this.traceHandler = new L.Handler.BearingTrace(this._map, this.bearings, this.options);
   },
   addHooks: function() {
     this._control.options.tools.route.handler.disable();
@@ -31,7 +32,7 @@ L.Handler.BearingBase = L.Handler.extend({
     L.DomEvent
       .on(document, 'keydown', this._onKeyDown, this);
 
-    map
+    this._map
       .fire('traceroute:bearing:start', this._control);
   },
   removeHooks: function() {
@@ -52,8 +53,8 @@ L.Handler.BearingBase = L.Handler.extend({
 
     this.traceHandler.disable();
 
-    map
-    .fire('traceroute:bearing:stop', this._control);
+    this._map
+      .fire('traceroute:bearing:stop', this._control);
   },
   _selectOrigin: function(e) {
     this.traceHandler.origin = e.layer;

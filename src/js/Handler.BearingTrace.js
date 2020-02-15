@@ -1,18 +1,19 @@
 import './Marker.Bearing'
 
 L.Handler.BearingTrace = L.Handler.extend({
-  initialize: function (bearings, options) {
+  initialize: function (map, bearings, options) {
     L.Util.setOptions(this, options);
 
+    this._map = map;
     this.bearings = bearings;
     this._pointer = new L.Polyline([], options.pointer);
   },
   addHooks: function() {
     this._clearPointer();
     this._pointer
-      .addTo(map);
+      .addTo(this._map);
 
-    map
+    this._map
       .on('mousemove', this._drawPointer, this)
       .on('click', this._setBearing, this);
 
@@ -26,9 +27,9 @@ L.Handler.BearingTrace = L.Handler.extend({
   removeHooks: function() {
     this._clearPointer();
     this._pointer
-      .removeFrom(map);
+      .removeFrom(this._map);
 
-    map
+    this._map
       .off('mousemove', this._drawPointer, this)
       .off('click', this._setBearing, this);
 
@@ -39,8 +40,8 @@ L.Handler.BearingTrace = L.Handler.extend({
   },
   _setBearing: function(e) {
     new L.Marker.Bearing(e.latlng, L.extend({ draggable:true }, this.options.marker, { trace: this.options.trace }) )
-      .setOrigin(this.origin)
-      .addTo(this.bearings);
+      .addTo(this.bearings)
+      .setOrigin(this.origin);
     this.disable();
   },
   _drawPointer: function(e) {
