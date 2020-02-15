@@ -11,9 +11,10 @@ L.Handler.RouteBase = L.Handler.extend({
   // this._routes = L.layerGroup()
   //   .addTo(this._map);
     this.startHandler = new L.Handler.RouteStart(this._map, control._routes, options);
+
+    this._map.on('traceroute:bearing:start', (e) => this.disable());
   },
   addHooks: function() {
-    if (typeof this._control.options.tools.bearing != 'undefined') this._control.options.tools.bearing.handler.disable();
     this._control.handler.enable();
     this.target.style.filter = 'invert(1)';
 
