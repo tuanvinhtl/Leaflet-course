@@ -8,7 +8,7 @@ L.Handler.ClearBase = L.Handler.extend({
     this.target.style.filter = 'invert(1)';
     this._control._routes.clearLayers();
     this._control.options.tools.track.handler.trace.setLatLngs([]);
-    this._map.fire('traceroute:clear', this._control);
+    this._map.fire('course:clear', this._control);
 
     this.disable();
   },

@@ -1,6 +1,6 @@
-import './Marker.Traceroute';
+import './Marker.Course';
 
-L.Marker.Bearing = L.Marker.Traceroute.extend({
+L.Marker.Bearing = L.Marker.Course.extend({
   initialize: function(latlng, options) {
     this.trace = new L.Polyline([], options.trace);
     delete options.trace;

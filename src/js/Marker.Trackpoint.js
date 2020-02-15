@@ -1,7 +1,7 @@
-import './Marker.Traceroute';
+import './Marker.Course';
 import 'leaflet-rotatedmarker'
 
-L.Marker.Trackpoint = L.Marker.Traceroute.extend({
+L.Marker.Trackpoint = L.Marker.Course.extend({
   decorate: function(e) {
     this
       ._extractLocation(e)

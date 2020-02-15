@@ -15,7 +15,7 @@ L.Handler.BearingBase = L.Handler.extend({
 
     this.traceHandler = new L.Handler.BearingTrace(this._map, this.bearings, this.options);
 
-    this._map.on('traceroute:route:start', (e) => this.disable());
+    this._map.on('course:route:start', (e) => this.disable());
   },
   addHooks: function() {
     this._control.handler.enable();
@@ -34,7 +34,7 @@ L.Handler.BearingBase = L.Handler.extend({
       .on(document, 'keydown', this._onKeyDown, this);
 
     this._map
-      .fire('traceroute:bearing:start', this._control);
+      .fire('course:bearing:start', this._control);
   },
   removeHooks: function() {
     L.DomEvent
@@ -55,7 +55,7 @@ L.Handler.BearingBase = L.Handler.extend({
     this.traceHandler.disable();
 
     this._map
-      .fire('traceroute:bearing:stop', this._control);
+      .fire('course:bearing:stop', this._control);
   },
   _selectOrigin: function(e) {
     this.traceHandler.origin = e.layer;

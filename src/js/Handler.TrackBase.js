@@ -21,7 +21,7 @@ L.Handler.TrackBase = L.Handler.extend({
       .on('locationfound', this._locationFound, this)
       .on('locationerror', this._locationError, this)
       .locate(L.extend({ watch: true }, this.options.locate))
-      .fire('traceroute:track:start', this._control);
+      .fire('course:track:start', this._control);
     this.trace.addTo(this._map);
   },
   removeHooks: function() {
@@ -29,7 +29,7 @@ L.Handler.TrackBase = L.Handler.extend({
 
     this._map
       .stopLocate()
-      .fire('traceroute:track:stop', this._control)
+      .fire('course:track:stop', this._control)
       .off('locationfound', this._locationFound, this)
       .off('locationerror', this._locationError, this);
   },
@@ -58,7 +58,7 @@ L.Handler.TrackBase = L.Handler.extend({
       .addTo(this._map)
       .addLatLng(e.latlng)
     this._map
-      .fire('traceroute:track:found', e)
+      .fire('course:track:found', e)
   },
   _locationError: function(e) {
     // Start a new polyine segment
@@ -67,6 +67,6 @@ L.Handler.TrackBase = L.Handler.extend({
       // .bindTooltip('Location lost', { direction: 'auto' })
       .addTo(this._map);
     this._map
-      .fire('traceroute:track:error', e)
+      .fire('course:track:error', e)
   }
 });

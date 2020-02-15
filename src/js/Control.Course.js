@@ -1,7 +1,7 @@
 import L from 'leaflet';
 
 import './LayerGroup.Route';
-import './Handler.Traceroute';
+import './Handler.Course';
 import './Handler.RouteBase';
 import './Handler.BearingBase';
 import './Handler.TrackBase';
@@ -9,7 +9,7 @@ import './Handler.ClearBase';
 import 'leaflet.geodesic';
 import '../css/trace.css';
 
-L.Control.Traceroute = L.Control.extend({
+L.Control.Course = L.Control.extend({
   options: {
     cursor: 'crosshair',
     tools: {
@@ -18,12 +18,12 @@ L.Control.Traceroute = L.Control.extend({
         title: 'Start a route',
         handler: L.Handler.RouteBase,
         waypoint: {
-          icon: L.divIcon({ className: 'leaflet-traceroute-icon', html: "<span class='leaflet-traceroute-point'></span>", iconAnchor: [20, 18], iconSize: [40, 40] }),
-          popup: p => `<pre>${JSON.stringify(L.Control.Traceroute.extract(p.export()), null, 2)}</pre>`,
-          tooltip: p => `<pre>${JSON.stringify(L.Control.Traceroute.extract(p.export()), null, 2)}</pre>`,
+          icon: L.divIcon({ className: 'leaflet-course-icon', html: "<span class='leaflet-course-point'></span>", iconAnchor: [20, 18], iconSize: [40, 40] }),
+          popup: p => `<pre>${JSON.stringify(L.Control.Course.extract(p.export()), null, 2)}</pre>`,
+          tooltip: p => `<pre>${JSON.stringify(L.Control.Course.extract(p.export()), null, 2)}</pre>`,
         },
         midpoint: {
-          icon: L.divIcon({ className: 'leaflet-traceroute-icon', html: "<div class='leaflet-traceroute-arrow'></div>", iconAnchor: [20, 18], iconSize: [40, 40] }),
+          icon: L.divIcon({ className: 'leaflet-course-icon', html: "<div class='leaflet-course-arrow'></div>", iconAnchor: [20, 18], iconSize: [40, 40] }),
           tooltip: 'Click to insert a waypoints here',
           opacity: 0.5
         },
@@ -35,8 +35,8 @@ L.Control.Traceroute = L.Control.extend({
         title: 'Radio Navigation',
         handler: L.Handler.BearingBase,
         marker: {
-          icon: L.divIcon({ className: 'leaflet-traceroute-icon', html: "<span class='leaflet-traceroute-losange'></span>", iconAnchor: [20, 18], iconSize: [40, 40] }),
-          tooltip: p => `<pre>${JSON.stringify(L.Control.Traceroute.extract(p.export()), null, 2)}</pre>`,
+          icon: L.divIcon({ className: 'leaflet-course-icon', html: "<span class='leaflet-course-losange'></span>", iconAnchor: [20, 18], iconSize: [40, 40] }),
+          tooltip: p => `<pre>${JSON.stringify(L.Control.Course.extract(p.export()), null, 2)}</pre>`,
         },
         trace: { dashArray: '5,5,1,5', opacity: 0.3, color: 'grey', },
         pointer: { dashArray: '8' }
@@ -46,8 +46,8 @@ L.Control.Traceroute = L.Control.extend({
         title: 'Track Position',
         handler: L.Handler.TrackBase,
         marker: {
-          icon: L.divIcon({ className: 'leaflet-traceroute-icon', html: "<div class='leaflet-traceroute-airplane'></div>", iconAnchor: [20, 18], iconSize: [40, 40] }),
-          tooltip: p => `<pre>${JSON.stringify(L.Control.Traceroute.extract(p.export()), null, 2)}</pre>`,
+          icon: L.divIcon({ className: 'leaflet-course-icon', html: "<div class='leaflet-course-airplane'></div>", iconAnchor: [20, 18], iconSize: [40, 40] }),
+          tooltip: p => `<pre>${JSON.stringify(L.Control.Course.extract(p.export()), null, 2)}</pre>`,
         },
         circle: {},
         trace: { weight: 5, opacity: 0.5, color: 'black' },
@@ -61,13 +61,13 @@ L.Control.Traceroute = L.Control.extend({
     },
   },
   initialize: function (options) {
-    L.Control.Traceroute.mergeDeep(this.options, options);
+    L.Control.Course.mergeDeep(this.options, options);
   },
   onAdd: function (map) {
     this._map = map;
     this._routes.addTo(map);
     
-    this.handler = new L.Handler.Traceroute(map, this);
+    this.handler = new L.Handler.Course(map, this);
     for (let tool of Object.values(this.options.tools)) {
       if (typeof tool != 'undefined') tool.handler = new tool.handler(map, this, tool);
     }
@@ -99,7 +99,7 @@ L.Control.Traceroute = L.Control.extend({
   _createControl: function (label, title, fn) {
     let control = document.createElement('a');
     control.innerHTML = label;
-    control.classList.add('leaflet-traceroute');
+    control.classList.add('leaflet-course');
     control.setAttribute('title', title);
     control.setAttribute('href', '#');
     control.setAttribute('role', 'button');
@@ -200,6 +200,6 @@ L.Control.Traceroute = L.Control.extend({
   }
 })
 
-L.control.traceroute = function (opts) {
-  return new L.Control.Traceroute(opts);
+L.control.course = function (opts) {
+  return new L.Control.Course(opts);
 };

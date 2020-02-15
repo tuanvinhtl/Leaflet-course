@@ -1,4 +1,4 @@
-# Leaflet.Control.Traceroute
+# Leaflet.Control.Course
 
 This plugin is heavily inspired by [Leaflet.PolylineMeasure](https://github.com/ppete2/Leaflet.PolylineMeasure) (even the README), I rewrote the plugin in a more 'leaflet' way using, markers, handler, icons, and so on in order to be more flexible.
 
@@ -14,22 +14,22 @@ This plugin is heavily inspired by [Leaflet.PolylineMeasure](https://github.com/
 * Work on **touchscreen** too. *rightclick* become *long press*
 
 ## Demo
-* Please take a look at the [**Demo**](https://elmatou.github.io/Leaflet-traceroute/dist/demo.html)
+* Please take a look at the [**Demo**](https://elmatou.github.io/Leaflet-course/dist/demo.html)
 
 ## Usage
 
 Add 1 line of code within your **HTML-file** to load the .js files of the plugin:
 ```html
-  <script src="src/js/leaflet-control-traceroute.js"></script>
+  <script src="src/js/leaflet-control-course.js"></script>
 ```
 
 Add 1 line of code within your **Javascript-file** to add the plugin's control into your Leaflet map.  
 
 ```js
-  L.control.traceroute(<options ?>).addTo(map);
+  L.control.course(<options ?>).addTo(map);
 ```
 
-Alternatively you can install the plugin with npm : `npm install leaflet-traceroute`
+Alternatively you can install the plugin with npm : `npm install leaflet-course`
 
 ## Options & defaults
 The default options are the following.
@@ -44,12 +44,12 @@ The default options are the following.
         title: 'Start a route',
         handler: L.Handler.RouteBase, // Should not be changed unless you extended the plugin
         waypoint: {
-          icon: L.divIcon({ className: 'leaflet-control-traceroute-icon', html: "<span class='leaflet-control-traceroute-point'></span>", iconAnchor: [20, 18], iconSize: [40, 40] }),
-          popup: p => `<pre>${JSON.stringify(L.Control.Traceroute.extract(p.export()), null, 2)}</pre>`,
-          tooltip: p => `<pre>${JSON.stringify(L.Control.Traceroute.extract(p.export()), null, 2)}</pre>`,
+          icon: L.divIcon({ className: 'leaflet-control-course-icon', html: "<span class='leaflet-control-course-point'></span>", iconAnchor: [20, 18], iconSize: [40, 40] }),
+          popup: p => `<pre>${JSON.stringify(L.Control.Course.extract(p.export()), null, 2)}</pre>`,
+          tooltip: p => `<pre>${JSON.stringify(L.Control.Course.extract(p.export()), null, 2)}</pre>`,
         },
         midpoint: {
-          icon: L.divIcon({ className: 'leaflet-control-traceroute-icon', html: "<div class='leaflet-control-traceroute-arrow'></div>", iconAnchor: [20, 18], iconSize: [40, 40] }),
+          icon: L.divIcon({ className: 'leaflet-control-course-icon', html: "<div class='leaflet-control-course-arrow'></div>", iconAnchor: [20, 18], iconSize: [40, 40] }),
           tooltip: 'Click to insert a waypoints here',
           opacity: 0.5
         },
@@ -61,8 +61,8 @@ The default options are the following.
         title: 'Radio Navigation',
         handler: L.Handler.BearingBase, // Should not be changed unless you extended the plugin
         marker: {
-          icon: L.divIcon({ className: 'leaflet-control-traceroute-icon', html: "<span class='leaflet-control-traceroute-losange'></span>", iconAnchor: [20, 18], iconSize: [40, 40] }),
-          tooltip: p => `<pre>${JSON.stringify(L.Control.Traceroute.extract(p.export()), null, 2)}</pre>`,
+          icon: L.divIcon({ className: 'leaflet-control-course-icon', html: "<span class='leaflet-control-course-losange'></span>", iconAnchor: [20, 18], iconSize: [40, 40] }),
+          tooltip: p => `<pre>${JSON.stringify(L.Control.Course.extract(p.export()), null, 2)}</pre>`,
         },
         trace: { dashArray: '5,5,1,5', opacity: 0.3, color: 'grey', }, // See Polyline for supported options
         pointer: { dashArray: '8' } // See Polyline for supported options
@@ -72,8 +72,8 @@ The default options are the following.
         title: 'Track Position',
         handler: L.Handler.TrackBase, // Should not be changed unless you extended the plugin
         marker: {
-          icon: L.divIcon({ className: 'leaflet-control-traceroute-icon', html: "<div class='leaflet-control-traceroute-airplane'></div>", iconAnchor: [20, 18], iconSize: [40, 40] }),
-          tooltip: p => `<pre>${JSON.stringify(L.Control.Traceroute.extract(p.export()), null, 2)}</pre>`,
+          icon: L.divIcon({ className: 'leaflet-control-course-icon', html: "<div class='leaflet-control-course-airplane'></div>", iconAnchor: [20, 18], iconSize: [40, 40] }),
+          tooltip: p => `<pre>${JSON.stringify(L.Control.Course.extract(p.export()), null, 2)}</pre>`,
         },
         circle: {},
         trace: { weight: 5, opacity: 0.5, color: 'black' }, // See Polyline for supported options
@@ -117,7 +117,7 @@ You can create new classes based on the current, just be sure to set the orienta
 ## Data structure
 We use subclasses of leaflet objects.
 
-### `<Control.Traceroute>`
+### `<Control.Course>`
 Extends `Control`, will load the tools set in options. will handle display of icons, and handle the state of each tool. Got an export() method to to get current route or track drawn by the plugin.
 
 #### `export()`
@@ -135,7 +135,7 @@ Represent a whole route, with points, lines and decorations, extends `LayerGroup
 
 ### `<Marker.Waypoint>`
 Waypoints are <Marker> decorated with input bearing, output bearing, distance from last point and distance from beginning. they are chained to make a route.
-You can add more attributes (like, name, altitude, ...) with a hook on the `traceroute:waypoint:add` events.
+You can add more attributes (like, name, altitude, ...) with a hook on the `course:waypoint:add` events.
 
 ```js
   <Marker.Waypoint>.data // {
@@ -155,7 +155,7 @@ to document : setSiblings(), toLast(), toFirst(), registerBearing(),
 
 ### `<Marker.Bearing>`
 Bearing are Markers decorated with input bearing, output bearing, distance.
-You can add more attributes (like, name, altitude, ...) with a hook on the `traceroute:waypoint:add` events.
+You can add more attributes (like, name, altitude, ...) with a hook on the `course:waypoint:add` events.
 ```js
   <Marker.Bearing>.data // {
   //   "QDR": 115.01,
@@ -181,42 +181,42 @@ You can add more attributes (like, name, altitude, ...) with a hook on the `trac
 It fire some events during the tracing in order to allow more interactivity with the app. Subscribe to events with :
 ```js
 map.on(
-  'traceroute:route:start' // <Control.Traceroute>
-  'traceroute:route:stop' // <Control.Traceroute>
-  'traceroute:route:update' // <LayerGroup.Route>
-  'traceroute:route:new' // <LayerGroup.Route>
-  'traceroute:route:finish' // <LayerGroup.Route>
-  'traceroute:route:abort' // <LayerGroup.Route>
-  'traceroute:route:resume' // <LayerGroup.Route>
+  'course:route:start' // <Control.Course>
+  'course:route:stop' // <Control.Course>
+  'course:route:update' // <LayerGroup.Route>
+  'course:route:new' // <LayerGroup.Route>
+  'course:route:finish' // <LayerGroup.Route>
+  'course:route:abort' // <LayerGroup.Route>
+  'course:route:resume' // <LayerGroup.Route>
 
-  'traceroute:clear' // nothing
+  'course:clear' // nothing
 
-  'traceroute:waypoint:add' // <Marker.Waypoint>
-  'traceroute:waypoint:move' // <Marker.Waypoint>
-  'traceroute:waypoint:remove' // <Marker.Waypoint>
-  'traceroute:waypoint:update' // <Marker.Waypoint>
+  'course:waypoint:add' // <Marker.Waypoint>
+  'course:waypoint:move' // <Marker.Waypoint>
+  'course:waypoint:remove' // <Marker.Waypoint>
+  'course:waypoint:update' // <Marker.Waypoint>
 
-  'traceroute:bearing:start' // <Control.Traceroute>
-  'traceroute:bearing:stop' // <Control.Traceroute>
-  'traceroute:bearing:add' //FIXME
-  'traceroute:bearing:move' //FIXME
-  'traceroute:bearing:remove' //FIXME
+  'course:bearing:start' // <Control.Course>
+  'course:bearing:stop' // <Control.Course>
+  'course:bearing:add' //FIXME
+  'course:bearing:move' //FIXME
+  'course:bearing:remove' //FIXME
 
-  'traceroute:track:start' // <Control.Traceroute>
-  'traceroute:track:stop' // <Control.Traceroute>
-  'traceroute:track:found' // <GeolocationPosition>
-  'traceroute:track:error' // <GeolocationPositionError>
+  'course:track:start' // <Control.Course>
+  'course:track:stop' // <Control.Course>
+  'course:track:found' // <GeolocationPosition>
+  'course:track:error' // <GeolocationPositionError>
 );
 ```
 
-Please take a look at the [**Demo**](https://elmatou.github.io/Leaflet-traceroute/dist/demo.html) each event is printed in the console.
+Please take a look at the [**Demo**](https://elmatou.github.io/Leaflet-course/dist/demo.html) each event is printed in the console.
 
 ## Helpers
 the library come with some handy function to help you.
 
 ```js
-L.Control.Traceroute.format(number, unit); // convert and format values issued from leaflet  Control.Traceroute or Geolocation API to the desired units. supports km, mi, NM, km/h, ft/min, kt, ft, °, time default to m
-L.Control.Traceroute.extract(data); // from (<Marker.Waypoint> | <Marker.Bearing> | <Marker.Trackpoint>).data . Filter and Format the data to print them elsewhere.
+L.Control.Course.format(number, unit); // convert and format values issued from leaflet  Control.Course or Geolocation API to the desired units. supports km, mi, NM, km/h, ft/min, kt, ft, °, time default to m
+L.Control.Course.extract(data); // from (<Marker.Waypoint> | <Marker.Bearing> | <Marker.Trackpoint>).data . Filter and Format the data to print them elsewhere.
 ```
 
 ## Extend the plugin with new tool
@@ -248,12 +248,12 @@ It is pretty easy to extend the plugin with new tools. You basicaly need to do t
   addHooks: function() {
     this.target.style.filter = 'invert(1)';
     // Set your behaviour here.
-    map.fire('traceroute:mytool:start'), this._control; // fire some event is a good practice
+    map.fire('course:mytool:start'), this._control; // fire some event is a good practice
   },
   removeHooks: function() {
     this.target.style.filter = 'invert(0)';
     // Unset your behaviour here.
-    map.fire('traceroute:mytool:stop', this._control); // fire some event is a good practice
+    map.fire('course:mytool:stop', this._control); // fire some event is a good practice
   },
 });
   ```

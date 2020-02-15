@@ -13,7 +13,7 @@ L.LayerGroup.Route = L.LayerGroup.extend({
     midpoint: { bubblingMouseEvents: false },
   },
   initialize: function (layer, options) {
-    L.Control.Traceroute.mergeDeep(this.options, options);
+    L.Control.Course.mergeDeep(this.options, options);
 
     this._layers = {};
     this.editHandler = new L.Handler.RouteEdit(this);
@@ -100,7 +100,7 @@ L.LayerGroup.Route = L.LayerGroup.extend({
           );
       });
 
-    this._mapToAdd.fire('traceroute:route:update', this);
+    this._mapToAdd.fire('course:route:update', this);
   },
   _drawMidpoint: function (prev, next) {
     if (prev instanceof L.Marker.Waypoint && next instanceof L.Marker.Waypoint) {
@@ -117,7 +117,7 @@ L.LayerGroup.Route = L.LayerGroup.extend({
     }
   },
   _fireWithLayer: function (e) {
-    this._mapToAdd.fire(`traceroute:waypoint:${e.type.replace('layer', '')}`, e.layer || e.target)
+    this._mapToAdd.fire(`course:waypoint:${e.type.replace('layer', '')}`, e.layer || e.target)
   },
   _handleParent: function (e) {
     switch (e.type) {

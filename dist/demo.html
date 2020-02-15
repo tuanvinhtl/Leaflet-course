@@ -3,11 +3,11 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leaflet Traceroute - Tracing a route</title>
+    <title>Leaflet Course - Tracing a route</title>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet-src.js"></script>
-    <script src="leaflet-traceroute.js"></script>
+    <script src="leaflet-course.js"></script>
 
     <style>
       body {padding: 0; margin: 0;}
@@ -18,7 +18,7 @@
     </style>
   </head>
   <body>
-    <style>#forkongithub a{background:#000;color:#fff;text-decoration:none;font-family:arial,sans-serif;text-align:center;font-weight:bold;padding:5px 40px;font-size:1rem;line-height:2rem;position:relative;transition:0.5s;}#forkongithub a:hover{background:#c11;color:#fff;}#forkongithub a::before,#forkongithub a::after{content:"";width:100%;display:block;position:absolute;top:1px;left:0;height:1px;background:#fff;}#forkongithub a::after{bottom:1px;top:auto;}@media screen and (min-width:800px){#forkongithub{position:fixed;display:block;top:0;right:0;width:200px;overflow:hidden;height:200px;z-index:9999;}#forkongithub a{width:200px;position:absolute;top:60px;right:-60px;transform:rotate(45deg);-webkit-transform:rotate(45deg);-ms-transform:rotate(45deg);-moz-transform:rotate(45deg);-o-transform:rotate(45deg);box-shadow:4px 4px 10px rgba(0,0,0,0.8);}}</style><span id="forkongithub"><a href="https://github.com/elmatou/Leaflet-traceroute">Fork me on GitHub</a></span>
+    <style>#forkongithub a{background:#000;color:#fff;text-decoration:none;font-family:arial,sans-serif;text-align:center;font-weight:bold;padding:5px 40px;font-size:1rem;line-height:2rem;position:relative;transition:0.5s;}#forkongithub a:hover{background:#c11;color:#fff;}#forkongithub a::before,#forkongithub a::after{content:"";width:100%;display:block;position:absolute;top:1px;left:0;height:1px;background:#fff;}#forkongithub a::after{bottom:1px;top:auto;}@media screen and (min-width:800px){#forkongithub{position:fixed;display:block;top:0;right:0;width:200px;overflow:hidden;height:200px;z-index:9999;}#forkongithub a{width:200px;position:absolute;top:60px;right:-60px;transform:rotate(45deg);-webkit-transform:rotate(45deg);-ms-transform:rotate(45deg);-moz-transform:rotate(45deg);-o-transform:rotate(45deg);box-shadow:4px 4px 10px rgba(0,0,0,0.8);}}</style><span id="forkongithub"><a href="https://github.com/elmatou/Leaflet-course">Fork me on GitHub</a></span>
     <div id="map"></div>
   </body>
   <script>
@@ -26,23 +26,23 @@
 
   var layerOsm = new L.TileLayer ('https://{s}.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {subdomains:['server','services'], maxZoom:19, noWrap:false, attribution:'<a href="https://www.arcgis.com/">ArcGIS</a>' });
   var mop = new L.Map ('map').addLayer(layerOsm).setView (new L.LatLng(48, 0), 4);
-  var traceroute = L.control.traceroute({ 
+  var course = L.control.course({ 
     position: 'topleft',
     tools: {
       route: {
         waypoint: {
-          popup: p => L.Util.template("<strong>in :</strong> {in}<br /><strong>out :</strong> {out}<br /><strong>distance :</strong> +{distance}<br /><strong>Total distance :</strong> {totalDistance}", L.Control.Traceroute.extract(Object.assign({in:0, out:0, distance:0, totalDistance:0}, p.data))),
-          tooltip: p => L.Util.template("<strong>in :</strong> {in}<br /><strong>out :</strong> {out}<br /><strong>distance :</strong> +{distance}", L.Control.Traceroute.extract(Object.assign({ in: 0, out: 0, distance: 0}, p.data))),
+          popup: p => L.Util.template("<strong>in :</strong> {in}<br /><strong>out :</strong> {out}<br /><strong>distance :</strong> +{distance}<br /><strong>Total distance :</strong> {totalDistance}", L.Control.Course.extract(Object.assign({in:0, out:0, distance:0, totalDistance:0}, p.data))),
+          tooltip: p => L.Util.template("<strong>in :</strong> {in}<br /><strong>out :</strong> {out}<br /><strong>distance :</strong> +{distance}", L.Control.Course.extract(Object.assign({ in: 0, out: 0, distance: 0}, p.data))),
         },
       },
       bearing: {
         marker: {
-          tooltip: p => L.Util.template("<strong>QDR :</strong> {qdr}<br /><strong>QDM :</strong> {qdm}<br /><strong>QGE :</strong> +{distance}", L.Control.Traceroute.extract(p.data)),
+          tooltip: p => L.Util.template("<strong>QDR :</strong> {qdr}<br /><strong>QDM :</strong> {qdm}<br /><strong>QGE :</strong> +{distance}", L.Control.Course.extract(p.data)),
         },
       },
       track: {
         marker: {
-          tooltip: p => L.Util.template("<strong>accuracy :</strong> {accuracy}<br /><strong>altitude (+/-{altitudeAccuracy}):</strong> {altitude} ({vario}) <br /><strong>heading :</strong> {heading} ({bearing})<br /><strong>speed :</strong> {speed} ({estimatedSpeed})<br />last seen at <strong>{time}</strong>", L.Control.Traceroute.extract(p.data)),
+          tooltip: p => L.Util.template("<strong>accuracy :</strong> {accuracy}<br /><strong>altitude (+/-{altitudeAccuracy}):</strong> {altitude} ({vario}) <br /><strong>heading :</strong> {heading} ({bearing})<br /><strong>speed :</strong> {speed} ({estimatedSpeed})<br />last seen at <strong>{time}</strong>", L.Control.Course.extract(p.data)),
         },
       },
     }
@@ -50,31 +50,31 @@
 
   var debugE = e => console.debug(e.type, e)
 
-  mop.on('traceroute:route:start', debugE);
-  mop.on('traceroute:route:stop', debugE);
-  mop.on('traceroute:route:update', debugE);
-  mop.on('traceroute:route:new', debugE);
-  mop.on('traceroute:route:finish', debugE);
-  mop.on('traceroute:route:abort', debugE);
-  mop.on('traceroute:route:resume', debugE);
+  mop.on('course:route:start', debugE);
+  mop.on('course:route:stop', debugE);
+  mop.on('course:route:update', debugE);
+  mop.on('course:route:new', debugE);
+  mop.on('course:route:finish', debugE);
+  mop.on('course:route:abort', debugE);
+  mop.on('course:route:resume', debugE);
 
-  mop.on('traceroute:clear', debugE);
+  mop.on('course:clear', debugE);
 
-  mop.on('traceroute:waypoint:add', debugE);
-  mop.on('traceroute:waypoint:move', debugE);
-  mop.on('traceroute:waypoint:remove', debugE);
-  mop.on('traceroute:waypoint:update', debugE);
+  mop.on('course:waypoint:add', debugE);
+  mop.on('course:waypoint:move', debugE);
+  mop.on('course:waypoint:remove', debugE);
+  mop.on('course:waypoint:update', debugE);
 
-  mop.on('traceroute:bearing:start', debugE);
-  mop.on('traceroute:bearing:stop', debugE);
-  mop.on('traceroute:bearing:add', debugE);
-  mop.on('traceroute:bearing:move', debugE);
-  mop.on('traceroute:bearing:remove', debugE);
+  mop.on('course:bearing:start', debugE);
+  mop.on('course:bearing:stop', debugE);
+  mop.on('course:bearing:add', debugE);
+  mop.on('course:bearing:move', debugE);
+  mop.on('course:bearing:remove', debugE);
 
-  mop.on('traceroute:track:start', debugE);
-  mop.on('traceroute:track:stop', debugE);
-  mop.on('traceroute:track:found', debugE);
-  mop.on('traceroute:track:error', debugE);
+  mop.on('course:track:start', debugE);
+  mop.on('course:track:stop', debugE);
+  mop.on('course:track:found', debugE);
+  mop.on('course:track:error', debugE);
 
   </script>
 </html>

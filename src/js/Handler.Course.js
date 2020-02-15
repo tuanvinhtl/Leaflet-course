@@ -1,5 +1,5 @@
 // Handle while control is enabled
-L.Handler.Traceroute = L.Handler.extend({
+L.Handler.Course = L.Handler.extend({
   initialize: function (map, control) {
     this._map = map;
     this._control = control;

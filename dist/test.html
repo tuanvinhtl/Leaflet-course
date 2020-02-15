@@ -4,13 +4,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Leaflet Traceroute - Tracing a route</title>
+  <title>Leaflet Course - Tracing a route</title>
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet-src.js"></script>
 
   <!-- <script src="https://cdn.jsdelivr.net/npm/leaflet.geodesic"></script> -->
-  <script src="leaflet-traceroute.js"></script>
+  <script src="leaflet-course.js"></script>
 
   <style>
     body {
@@ -92,7 +92,7 @@
         box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.8);
       }
     }
-  </style><span id="forkongithub"><a href="https://github.com/elmatou/Leaflet-traceroute">Fork me on GitHub</a></span>
+  </style><span id="forkongithub"><a href="https://github.com/elmatou/Leaflet-course">Fork me on GitHub</a></span>
   <div id="map"></div>
 </body>
 <script>
@@ -114,7 +114,7 @@
     .addLayer(layerAIP)
     .setView(new L.LatLng(43.215398, 0.078266), 14);
 
-  var traceroute = L.control.traceroute({
+  var course = L.control.course({
     position: 'bottomleft',
     cursor: 'copy',
     tools: {
@@ -141,30 +141,30 @@
 
   var debugE = e => console.debug(e.type, e)
 
-  mop.on('traceroute:route:start', debugE);
-  mop.on('traceroute:route:stop', debugE);
-  mop.on('traceroute:route:update', debugE);
-  mop.on('traceroute:route:new', debugE);
-  mop.on('traceroute:route:finish', debugE);
-  mop.on('traceroute:route:abort', debugE);
-  mop.on('traceroute:route:resume', debugE);
+  mop.on('course:route:start', debugE);
+  mop.on('course:route:stop', debugE);
+  mop.on('course:route:update', debugE);
+  mop.on('course:route:new', debugE);
+  mop.on('course:route:finish', debugE);
+  mop.on('course:route:abort', debugE);
+  mop.on('course:route:resume', debugE);
 
-  mop.on('traceroute:clear', debugE);
+  mop.on('course:clear', debugE);
 
-  mop.on('traceroute:waypoint:add', debugE);
-  mop.on('traceroute:waypoint:move', debugE);
-  mop.on('traceroute:waypoint:remove', debugE);
-  mop.on('traceroute:waypoint:update', debugE);
+  mop.on('course:waypoint:add', debugE);
+  mop.on('course:waypoint:move', debugE);
+  mop.on('course:waypoint:remove', debugE);
+  mop.on('course:waypoint:update', debugE);
 
-  mop.on('traceroute:bearing:start', debugE);
-  mop.on('traceroute:bearing:stop', debugE);
-  mop.on('traceroute:bearing:add', debugE);
-  mop.on('traceroute:bearing:move', debugE);
-  mop.on('traceroute:bearing:remove', debugE);
+  mop.on('course:bearing:start', debugE);
+  mop.on('course:bearing:stop', debugE);
+  mop.on('course:bearing:add', debugE);
+  mop.on('course:bearing:move', debugE);
+  mop.on('course:bearing:remove', debugE);
 
-  mop.on('traceroute:track:start', debugE);
-  mop.on('traceroute:track:stop', debugE);
-  mop.on('traceroute:track:found', debugE);
+  mop.on('course:track:start', debugE);
+  mop.on('course:track:stop', debugE);
+  mop.on('course:track:found', debugE);
 
 </script>
 

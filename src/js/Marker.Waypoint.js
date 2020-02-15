@@ -1,8 +1,8 @@
-import './Marker.Traceroute';
+import './Marker.Course';
 import 'leaflet-rotatedmarker';
 import 'leaflet.geodesic';
 
-L.Marker.Waypoint = L.Marker.Traceroute.extend({
+L.Marker.Waypoint = L.Marker.Course.extend({
   geodesic: L.geodesic().geom.geodesic,
   export: function () {
     this.data.id = this._leaflet_id;

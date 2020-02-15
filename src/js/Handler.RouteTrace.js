@@ -40,7 +40,7 @@ L.Handler.RouteTrace = L.Handler.extend({
     this._parent.enable();
   },
   _createRoute: function() {
-    this._map.fire('traceroute:route:new', this._route);
+    this._map.fire('course:route:new', this._route);
     return this._route = new L.LayerGroup.Route([], this.options)
       .addTo(this._routes);
   },
@@ -55,10 +55,10 @@ L.Handler.RouteTrace = L.Handler.extend({
   },
   _finishRoute: function() {
     if (this._route.clean()) {
-      this._map.fire('traceroute:route:finish', this._route);
+      this._map.fire('course:route:finish', this._route);
       this._route.editHandler.enable();
     } else {
-      this._map.fire('traceroute:route:abort', this._route);
+      this._map.fire('course:route:abort', this._route);
       this._route.remove();
     }
     this.disable();

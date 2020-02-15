@@ -12,7 +12,7 @@ L.Handler.RouteBase = L.Handler.extend({
   //   .addTo(this._map);
     this.startHandler = new L.Handler.RouteStart(this._map, control._routes, options);
 
-    this._map.on('traceroute:bearing:start', (e) => this.disable());
+    this._map.on('course:bearing:start', (e) => this.disable());
   },
   addHooks: function() {
     this._control.handler.enable();
@@ -21,14 +21,14 @@ L.Handler.RouteBase = L.Handler.extend({
     L.DomEvent
       .on(document, 'keydown', this._onKeyDown, this);
     this._map
-      .fire('traceroute:route:start', this._control);
+      .fire('course:route:start', this._control);
     this.startHandler.enable();
   },
   removeHooks: function() {
     L.DomEvent
       .off(document, 'keydown', this._onKeyDown, this);
     this._map
-      .fire('traceroute:route:stop', this._control);
+      .fire('course:route:stop', this._control);
 
     this.target.style.filter = 'invert(0)';
     this._control.handler.disable();

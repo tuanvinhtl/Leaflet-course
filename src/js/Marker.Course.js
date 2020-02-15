@@ -1,4 +1,4 @@
-L.Marker.Traceroute = L.Marker.extend({
+L.Marker.Course = L.Marker.extend({
   initialize: function (latlng, options) {
     this.fellow = {};
     this.data = {};

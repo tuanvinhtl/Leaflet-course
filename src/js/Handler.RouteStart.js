@@ -34,6 +34,6 @@ L.Handler.RouteStart = L.Handler.extend({
     this.traceHandler._route = e.layer.parent;
     this.traceHandler._route.editHandler.disable();
     this.traceHandler.enable();
-    map.fire('traceroute:route:resume', this.traceHandler._route);
+    map.fire('course:route:resume', this.traceHandler._route);
     },
 });

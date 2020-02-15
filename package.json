@@ -1,8 +1,8 @@
 {
-  "name": "leaflet-traceroute",
+  "name": "leaflet-course",
   "version": "0.9.2",
   "description": "Leaflet Control to help trace a route on earth, provides distance & bearing on great circle path.",
-  "main": "dist/leaflet-traceroute.js",
+  "main": "dist/leaflet-course.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "webpack --watch",

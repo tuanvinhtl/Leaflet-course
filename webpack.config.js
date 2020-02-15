@@ -9,7 +9,7 @@ module.exports = {
   devtool: 'inline-source-map',
   context: path.resolve(__dirname, 'src'),
   entry: {
-    traceroute: './js/Control.Traceroute.js',
+    course: './js/Control.Course.js',
   },
   output: {
     filename: 'leaflet-[name].js',
