@@ -6,7 +6,7 @@ const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
 module.exports = {
   mode: 'development',
-  devtool: 'source-map',
+  devtool: 'inline-source-map',
   context: path.resolve(__dirname, 'src'),
   entry: {
     traceroute: './js/Control.Traceroute.js',
@@ -33,11 +33,12 @@ module.exports = {
     ]
   },
   devServer: {
-    contentBase: [__dirname, path.join(__dirname, 'dist')],
     contentBase: 'dist/',
     watchContentBase: true,
     https: true,
     open: true,
-    openPage: ['webpack-dev-server/test.html'],
+    openPage: ['test.html'],
+    inline: true,
+    hot: true
   }
 };
